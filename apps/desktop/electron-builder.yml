@@ -1,0 +1,15 @@
+appId: ke.ac.greenfield.school
+productName: Greenfield Academy
+directories:
+  output: ../../release/desktop
+files:
+  - main.cjs
+  - ../../dist/**/*
+win:
+  target: nsis
+  icon: ../../assets/icon/master.svg
+nsis:
+  oneClick: false
+  perMachine: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

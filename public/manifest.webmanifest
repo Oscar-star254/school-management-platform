@@ -1,0 +1,12 @@
+{
+  "name": "Greenfield School Platform",
+  "short_name": "Greenfield",
+  "description": "Offline-ready learner, teacher and school administration portal.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fa",
+  "theme_color": "#2fb36d",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

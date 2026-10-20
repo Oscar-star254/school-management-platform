@@ -1,0 +1,10 @@
+{
+  "description": "Comprehensive Kenyan primary school management platform with portals for students, parents, teachers, and admins featuring offline access, CBC grading, fees, and reports.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

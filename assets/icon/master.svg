@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Academic shield with open book">
+  <rect width="1024" height="1024" rx="224" fill="#f6f8fa"/>
+  <path d="M512 102 824 220v260c0 202-124 356-312 442C324 836 200 682 200 480V220z" fill="#2fb36d"/>
+  <path d="M512 169 758 262v214c0 158-91 282-246 362-155-80-246-204-246-362V262z" fill="#fff" opacity=".14"/>
+  <path d="M320 390c77-15 142 2 192 49 50-47 115-64 192-49v264c-75-14-140 2-192 48-52-46-117-62-192-48z" fill="#fff"/>
+  <path d="M512 439v263M354 438c61-4 111 10 158 46M670 438c-61-4-111 10-158 46" fill="none" stroke="#d9eee2" stroke-width="28" stroke-linecap="round"/>
+  <path d="m512 274 192 64-192 64-192-64z" fill="#1f2a37"/>
+  <path d="M638 373v86" fill="none" stroke="#1f2a37" stroke-width="25" stroke-linecap="round"/>
+  <circle cx="638" cy="476" r="19" fill="#e8a832"/>
+</svg>

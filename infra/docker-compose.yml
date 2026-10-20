@@ -1,0 +1,30 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: infra/web.Dockerfile
+    ports: ["8080:80"]
+    depends_on: [api]
+  api:
+    build:
+      context: ..
+      dockerfile: infra/api.Dockerfile
+    environment:
+      API_PORT: 3001
+      DATABASE_URL: postgresql://school:${POSTGRES_PASSWORD:-school}@postgres:5432/school
+      REDIS_URL: redis://redis:6379
+    depends_on: [postgres, redis]
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: school
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-school}
+      POSTGRES_DB: school
+    volumes: [postgres-data:/var/lib/postgresql/data]
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: [redis-data:/data]
+volumes:
+  postgres-data:
+  redis-data:
