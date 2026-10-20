@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'academic-years': AcademicYear;
+    terms: Term;
+    classes: Class;
+    subjects: Subject;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +82,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'academic-years': AcademicYearsSelect<false> | AcademicYearsSelect<true>;
+    terms: TermsSelect<false> | TermsSelect<true>;
+    classes: ClassesSelect<false> | ClassesSelect<true>;
+    subjects: SubjectsSelect<false> | SubjectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -123,6 +131,18 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name: string;
+  role:
+    | 'super_admin'
+    | 'school_admin'
+    | 'academic_admin'
+    | 'finance_admin'
+    | 'teacher'
+    | 'class_teacher'
+    | 'student'
+    | 'parent';
+  status: 'active' | 'suspended';
+  phone?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -164,6 +184,77 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "academic-years".
+ */
+export interface AcademicYear {
+  id: number;
+  /**
+   * e.g. 2026
+   */
+  name: string;
+  startDate: string;
+  endDate: string;
+  isCurrent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terms".
+ */
+export interface Term {
+  id: number;
+  academicYear: number | AcademicYear;
+  /**
+   * e.g. Term 1
+   */
+  name: string;
+  startDate: string;
+  endDate: string;
+  isCurrent?: boolean | null;
+  /**
+   * Locked terms reject changes to marks, attendance and fees.
+   */
+  isLocked?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "classes".
+ */
+export interface Class {
+  id: number;
+  name?: string | null;
+  /**
+   * e.g. Grade 4
+   */
+  grade: string;
+  /**
+   * e.g. East (optional)
+   */
+  stream?: string | null;
+  academicYear: number | AcademicYear;
+  classTeacher?: (number | null) | User;
+  capacity?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subjects".
+ */
+export interface Subject {
+  id: number;
+  name: string;
+  code: string;
+  department?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -193,6 +284,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'academic-years';
+        value: number | AcademicYear;
+      } | null)
+    | ({
+        relationTo: 'terms';
+        value: number | Term;
+      } | null)
+    | ({
+        relationTo: 'classes';
+        value: number | Class;
+      } | null)
+    | ({
+        relationTo: 'subjects';
+        value: number | Subject;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -241,6 +348,10 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  status?: T;
+  phone?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -276,6 +387,58 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "academic-years_select".
+ */
+export interface AcademicYearsSelect<T extends boolean = true> {
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  isCurrent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "terms_select".
+ */
+export interface TermsSelect<T extends boolean = true> {
+  academicYear?: T;
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  isCurrent?: T;
+  isLocked?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "classes_select".
+ */
+export interface ClassesSelect<T extends boolean = true> {
+  name?: T;
+  grade?: T;
+  stream?: T;
+  academicYear?: T;
+  classTeacher?: T;
+  capacity?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subjects_select".
+ */
+export interface SubjectsSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  department?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
