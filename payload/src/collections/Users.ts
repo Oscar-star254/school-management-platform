@@ -17,6 +17,7 @@ import {
   selfOrRoles,
 } from '../access'
 import type { Role } from '../access'
+import { auditAfterChange, auditAfterDelete } from '../hooks/audit'
 
 const deny = (message: string) => new APIError(message, 403, null, true)
 
@@ -97,6 +98,8 @@ export const Users: CollectionConfig = {
   hooks: {
     beforeChange: [enforceRoleRules],
     beforeLogin: [blockSuspendedLogin],
+    afterChange: [auditAfterChange('users', { trackValues: ['role', 'status'] })],
+    afterDelete: [auditAfterDelete('users')],
   },
   fields: [
     { name: 'name', type: 'text', required: true },

@@ -73,6 +73,12 @@ export interface Config {
     terms: Term;
     classes: Class;
     subjects: Subject;
+    students: Student;
+    guardians: Guardian;
+    'guardian-links': GuardianLink;
+    staff: Staff;
+    'teacher-assignments': TeacherAssignment;
+    'audit-logs': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +92,12 @@ export interface Config {
     terms: TermsSelect<false> | TermsSelect<true>;
     classes: ClassesSelect<false> | ClassesSelect<true>;
     subjects: SubjectsSelect<false> | SubjectsSelect<true>;
+    students: StudentsSelect<false> | StudentsSelect<true>;
+    guardians: GuardiansSelect<false> | GuardiansSelect<true>;
+    'guardian-links': GuardianLinksSelect<false> | GuardianLinksSelect<true>;
+    staff: StaffSelect<false> | StaffSelect<true>;
+    'teacher-assignments': TeacherAssignmentsSelect<false> | TeacherAssignmentsSelect<true>;
+    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -255,6 +267,121 @@ export interface Subject {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students".
+ */
+export interface Student {
+  id: number;
+  /**
+   * Leave blank to generate automatically (ADM-1001, ADM-1002, ...).
+   */
+  admissionNumber?: string | null;
+  firstName: string;
+  lastName: string;
+  name?: string | null;
+  dateOfBirth?: string | null;
+  gender?: ('female' | 'male') | null;
+  admissionDate?: string | null;
+  currentClass?: (number | null) | Class;
+  status: 'active' | 'transferred' | 'withdrawn' | 'completed';
+  /**
+   * Login account for this student (optional).
+   */
+  user?: (number | null) | User;
+  health?: {
+    medicalNotes?: string | null;
+    emergencyContactName?: string | null;
+    emergencyContactPhone?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guardians".
+ */
+export interface Guardian {
+  id: number;
+  name: string;
+  /**
+   * Login account for this parent/guardian.
+   */
+  user?: (number | null) | User;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guardian-links".
+ */
+export interface GuardianLink {
+  id: number;
+  guardian: number | Guardian;
+  student: number | Student;
+  relationship: 'mother' | 'father' | 'guardian' | 'other';
+  isPrimary?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff".
+ */
+export interface Staff {
+  id: number;
+  user: number | User;
+  staffNumber: string;
+  jobTitle?: string | null;
+  phone?: string | null;
+  employmentType?: ('permanent' | 'contract' | 'part_time' | 'volunteer') | null;
+  employmentDate?: string | null;
+  /**
+   * Employment status. Login suspension is set on the user account.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teacher-assignments".
+ */
+export interface TeacherAssignment {
+  id: number;
+  teacher: number | User;
+  class: number | Class;
+  subject: number | Subject;
+  academicYear: number | AcademicYear;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs".
+ */
+export interface AuditLog {
+  id: number;
+  action: 'create' | 'update' | 'delete';
+  targetCollection: string;
+  targetId: string;
+  actor?: (number | null) | User;
+  summary?: string | null;
+  changedFields?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -300,6 +427,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'subjects';
         value: number | Subject;
+      } | null)
+    | ({
+        relationTo: 'students';
+        value: number | Student;
+      } | null)
+    | ({
+        relationTo: 'guardians';
+        value: number | Guardian;
+      } | null)
+    | ({
+        relationTo: 'guardian-links';
+        value: number | GuardianLink;
+      } | null)
+    | ({
+        relationTo: 'staff';
+        value: number | Staff;
+      } | null)
+    | ({
+        relationTo: 'teacher-assignments';
+        value: number | TeacherAssignment;
+      } | null)
+    | ({
+        relationTo: 'audit-logs';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -437,6 +588,97 @@ export interface SubjectsSelect<T extends boolean = true> {
   code?: T;
   department?: T;
   isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students_select".
+ */
+export interface StudentsSelect<T extends boolean = true> {
+  admissionNumber?: T;
+  firstName?: T;
+  lastName?: T;
+  name?: T;
+  dateOfBirth?: T;
+  gender?: T;
+  admissionDate?: T;
+  currentClass?: T;
+  status?: T;
+  user?: T;
+  health?:
+    | T
+    | {
+        medicalNotes?: T;
+        emergencyContactName?: T;
+        emergencyContactPhone?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guardians_select".
+ */
+export interface GuardiansSelect<T extends boolean = true> {
+  name?: T;
+  user?: T;
+  phone?: T;
+  email?: T;
+  address?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guardian-links_select".
+ */
+export interface GuardianLinksSelect<T extends boolean = true> {
+  guardian?: T;
+  student?: T;
+  relationship?: T;
+  isPrimary?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff_select".
+ */
+export interface StaffSelect<T extends boolean = true> {
+  user?: T;
+  staffNumber?: T;
+  jobTitle?: T;
+  phone?: T;
+  employmentType?: T;
+  employmentDate?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teacher-assignments_select".
+ */
+export interface TeacherAssignmentsSelect<T extends boolean = true> {
+  teacher?: T;
+  class?: T;
+  subject?: T;
+  academicYear?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  action?: T;
+  targetCollection?: T;
+  targetId?: T;
+  actor?: T;
+  summary?: T;
+  changedFields?: T;
   updatedAt?: T;
   createdAt?: T;
 }
