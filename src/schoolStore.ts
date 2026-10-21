@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react"
+import { API_ENABLED } from "./api"
 
 export const SUBJECTS = [
   "English",
@@ -90,11 +91,21 @@ const initialState: SchoolState = {
   ),
 }
 
+const serverInitialState: SchoolState = { ...initialState, learners: [], marks: {} }
+
+function guardDemo() {
+  if (API_ENABLED)
+    throw new Error(
+      "This action is not connected to the school database yet. Please use the school admin panel.",
+    )
+}
+
 const storageKey = "greenfield-school-data-v1"
 let state: SchoolState = load()
 const listeners = new Set<() => void>()
 
 function load(): SchoolState {
+  if (API_ENABLED) return serverInitialState
   try {
     const stored = localStorage.getItem(storageKey)
     return stored ? { ...initialState, ...JSON.parse(stored) } : initialState
@@ -105,7 +116,7 @@ function load(): SchoolState {
 
 function save(next: SchoolState) {
   state = next
-  localStorage.setItem(storageKey, JSON.stringify(state))
+  if (!API_ENABLED) localStorage.setItem(storageKey, JSON.stringify(state))
   listeners.forEach((listener) => listener())
 }
 
@@ -136,6 +147,7 @@ export function activeLearner(store: SchoolState) {
 
 export const schoolActions = {
   updateMark(admission: string, subject: string, mark: number | null) {
+    guardDemo()
     save({
       ...state,
       marks: {
@@ -145,6 +157,7 @@ export const schoolActions = {
     })
   },
   addLearner(learner: Learner) {
+    guardDemo()
     if (
       state.learners.some(
         (item) =>
@@ -164,6 +177,7 @@ export const schoolActions = {
     })
   },
   updateLearner(admission: string, changes: Partial<Learner>) {
+    guardDemo()
     save({
       ...state,
       learners: state.learners.map((learner) =>
@@ -172,9 +186,11 @@ export const schoolActions = {
     })
   },
   updateSchool(settings: Pick<SchoolState, "schoolName" | "motto">) {
+    guardDemo()
     save({ ...state, ...settings })
   },
   resetDemo() {
+    guardDemo()
     save(initialState)
   },
 }
@@ -214,4 +230,17 @@ export function reportReady(store: SchoolState, admission: string) {
   return SUBJECTS.every(
     (subject) => typeof store.marks[admission]?.[subject] === "number",
   )
+}
+
+/** Replaces the learner list with data from the school server (not saved in the browser). */
+export function hydrateLearners(learners: Learner[]) {
+  const empty = Object.fromEntries(SUBJECTS.map((subject) => [subject, null]))
+  state = {
+    ...state,
+    learners,
+    marks: Object.fromEntries(
+      learners.map((learner) => [learner.admission, state.marks[learner.admission] ?? empty]),
+    ),
+  }
+  listeners.forEach((listener) => listener())
 }

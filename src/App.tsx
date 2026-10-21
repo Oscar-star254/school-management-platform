@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useState } from "react"
+import { FormEvent, ReactNode, useEffect, useState } from "react"
 import {
   ArrowDownToLine,
   Bell,
@@ -40,6 +40,16 @@ import {
   setActiveLearner,
   useSchoolStore,
 } from "./schoolStore"
+
+import {
+  API_ENABLED,
+  apiLearners,
+  apiLogin,
+  apiLogout,
+  apiMe,
+  portalForRole,
+} from "./api"
+import { hydrateLearners } from "./schoolStore"
 
 type LoginKind = "student" | "teacher"
 type Portal = "login" | "student" | "teacher" | "admin"
@@ -255,7 +265,7 @@ function LoginPanel({
   kind: LoginKind
   active: boolean
   onActivate: () => void
-  onLogin: (username: string, remember: boolean) => void
+  onLogin: (username: string, remember: boolean, password: string) => void
   onModal: (modal: "contact" | "help") => void
 }) {
   const [username, setUsername] = useState("")
@@ -266,7 +276,7 @@ function LoginPanel({
 
   function submit(event: FormEvent) {
     event.preventDefault()
-    if (ready) onLogin(username, remember)
+    if (ready) onLogin(username, remember, password)
   }
 
   return (
@@ -377,6 +387,24 @@ function Login({
   const [active, setActive] = useState<LoginKind>("student")
   const [modal, setModal] = useState<"contact" | "help" | null>(null)
   const school = useSchoolStore()
+  const [loginError, setLoginError] = useState("")
+  async function apiSignIn(identifier: string, password: string, remember: boolean) {
+    try {
+      const user = await apiLogin(identifier.trim(), password)
+      const next = portalForRole(user.role)
+      if (!next) throw new Error("This account cannot use the school portal.")
+      const learners = await apiLearners()
+      hydrateLearners(learners)
+      if (next === "student") {
+        const first = learners.find((item) => item.status === "Active")
+        if (first) setActiveLearner(first.admission)
+      }
+      onEnter(next, remember)
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : "Sign in failed")
+      setModal("help")
+    }
+  }
   return (
     <main className="login-page">
       <div className="mobile-switch" aria-label="Choose login type">
@@ -397,7 +425,8 @@ function Login({
         kind="student"
         active={active === "student"}
         onActivate={() => setActive("student")}
-        onLogin={(username, remember) => {
+        onLogin={(username, remember, password) => {
+          if (API_ENABLED) return void apiSignIn(username, password, remember)
           const learner = school.learners.find(
             (item) =>
               item.admission.toLowerCase() === username.toLowerCase() &&
@@ -416,11 +445,15 @@ function Login({
         kind="teacher"
         active={active === "teacher"}
         onActivate={() => setActive("teacher")}
-        onLogin={(username, remember) =>
-          onEnter(
-            /admin|head|bursar|secretary/i.test(username) ? "admin" : "teacher",
-            remember,
-          )
+        onLogin={(username, remember, password) =>
+          API_ENABLED
+            ? void apiSignIn(username, password, remember)
+            : onEnter(
+                /admin|head|bursar|secretary/i.test(username)
+                  ? "admin"
+                  : "teacher",
+                remember,
+              )
         }
         onModal={setModal}
       />
@@ -443,6 +476,7 @@ function Login({
       )}
       {modal === "help" && (
         <Modal title="Login help" onClose={() => setModal(null)}>
+          {loginError && <p className="modal-note">{loginError}</p>}
           <p>
             Learners and parents sign in with the learner admission number.
             Staff use their school username.
@@ -1363,20 +1397,50 @@ function Page({
 
 export default function App() {
   const [portal, setPortal] = useState<Portal>(() => {
+    if (API_ENABLED) return "login"
     const saved = localStorage.getItem("greenfield-session")
     return saved === "student" || saved === "teacher" || saved === "admin"
       ? saved
       : "login"
   })
+  const [checking, setChecking] = useState(API_ENABLED)
+  useEffect(() => {
+    if (!API_ENABLED) return
+    let cancelled = false
+    apiMe()
+      .then(async (user) => {
+        const next = user ? portalForRole(user.role) : null
+        if (!next) return
+        const learners = await apiLearners().catch(() => [])
+        hydrateLearners(learners)
+        if (next === "student") {
+          const first = learners.find((item) => item.status === "Active")
+          if (first) setActiveLearner(first.admission)
+        }
+        if (!cancelled) setPortal(next)
+      })
+      .finally(() => {
+        if (!cancelled) setChecking(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   function enter(next: Portal, remember = false) {
     setPortal(next)
-    if (remember && next !== "login")
+    if (!API_ENABLED && remember && next !== "login")
       localStorage.setItem("greenfield-session", next)
   }
   function logout() {
+    if (API_ENABLED) {
+      void apiLogout()
+      hydrateLearners([])
+      sessionStorage.removeItem("greenfield-active-learner")
+    }
     localStorage.removeItem("greenfield-session")
     setPortal("login")
   }
+  if (checking) return null
   return portal === "login" ? (
     <Login onEnter={enter} />
   ) : (

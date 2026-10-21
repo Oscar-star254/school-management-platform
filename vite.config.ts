@@ -34,6 +34,8 @@ react(),
       host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
       port: parseInt(process.env.PORT || '8443'),
       strictPort: true,
+      // Send /api calls to the Payload server so login cookies stay same-origin.
+      proxy: { '/api': { target: process.env.VITE_DEV_API ?? 'http://localhost:3000' } },
       watch: {
         ignored: [
           '**/.figma/**',

@@ -21,6 +21,12 @@ import { AuditLogs } from './collections/AuditLogs'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Addresses allowed to send logged-in (cookie) requests: the API itself and the website.
+const origins = [
+  process.env.PAYLOAD_PUBLIC_URL ?? 'http://localhost:3000',
+  ...(process.env.WEB_ORIGINS ?? 'http://localhost:8443').split(',').map((o) => o.trim()),
+].filter(Boolean)
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -44,6 +50,8 @@ export default buildConfig({
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  cors: origins,
+  csrf: origins,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

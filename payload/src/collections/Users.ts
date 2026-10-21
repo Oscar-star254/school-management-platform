@@ -87,6 +87,10 @@ export const Users: CollectionConfig = {
     tokenExpiration: 60 * 60 * 8, // 8 hours
     maxLoginAttempts: 5,
     lockTime: 10 * 60 * 1000, // 10 minutes
+    cookies: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    },
   },
   access: {
     admin: canUseAdminPanel,
