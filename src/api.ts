@@ -32,6 +32,8 @@ export function portalForRole(role?: string): PortalName | null {
   return null
 }
 
+type FieldError = { path?: string; field?: string; message?: string }
+
 async function call(path: string, init: RequestInit = {}) {
   const response = await fetch(`/api${path}`, {
     credentials: "include",
@@ -40,8 +42,12 @@ async function call(path: string, init: RequestInit = {}) {
   })
   const body = await response.json().catch(() => ({}))
   if (!response.ok) {
+    const first = body?.errors?.[0]
+    const details = (first?.data?.errors as FieldError[] | undefined)
+      ?.map((e) => `${e.path ?? e.field ?? "field"}: ${e.message ?? "invalid"}`)
+      .join("; ")
     const message =
-      body?.errors?.[0]?.message ?? body?.message ?? `Request failed (${response.status})`
+      details || first?.message || body?.message || `Request failed (${response.status})`
     throw new ApiError(message, response.status)
   }
   return body
@@ -70,6 +76,33 @@ export async function apiLogout(): Promise<void> {
   } catch {
     /* ignore: the cookie is cleared or already expired */
   }
+}
+
+/** List records of a collection. `query` is a URL query string (limit, depth, sort, where). */
+export async function apiFind<T>(collection: string, query = "limit=200&depth=0"): Promise<T[]> {
+  const data = await call(`/${collection}?${query}`)
+  return data.docs as T[]
+}
+
+export async function apiCount(collection: string): Promise<number> {
+  const data = await call(`/${collection}?limit=1&depth=0`)
+  return data.totalDocs as number
+}
+
+export async function apiCreate<T = Record<string, unknown>>(
+  collection: string,
+  data: Record<string, unknown>,
+): Promise<T> {
+  const result = await call(`/${collection}`, { method: "POST", body: JSON.stringify(data) })
+  return result.doc as T
+}
+
+export async function apiUpdate(
+  collection: string,
+  id: number,
+  data: Record<string, unknown>,
+): Promise<void> {
+  await call(`/${collection}/${id}`, { method: "PATCH", body: JSON.stringify(data) })
 }
 
 type ApiStudent = {

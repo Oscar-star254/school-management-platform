@@ -20,6 +20,16 @@ import {
   UsersRound,
 } from "lucide-react"
 import { LearnerStatus, schoolActions, useSchoolStore } from "./schoolStore"
+import { API_ENABLED } from "./api"
+import {
+  AuditLive,
+  ComingSoon,
+  DashboardLive,
+  GuardiansLive,
+  LearnersLive,
+  StaffLive,
+  UsersRolesLive,
+} from "./AdminPeople"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
@@ -635,6 +645,26 @@ function SchoolSettings() {
 }
 
 export function AdminContent({ page }: { page: string }) {
+  if (!API_ENABLED) return <AdminContentDemo page={page} />
+  switch (page) {
+    case "Dashboard":
+      return <DashboardLive />
+    case "Learners":
+      return <LearnersLive />
+    case "Guardians":
+      return <GuardiansLive />
+    case "Staff":
+      return <StaffLive />
+    case "Users & roles":
+      return <UsersRolesLive />
+    case "Audit log":
+      return <AuditLive />
+    default:
+      return <ComingSoon page={page} />
+  }
+}
+
+function AdminContentDemo({ page }: { page: string }) {
   const school = useSchoolStore()
   const title = page === "Dashboard" ? "School overview" : page
   const iconMap: Record<string, typeof BookOpen> = {
