@@ -58,13 +58,15 @@ export async function apiLogin(email: string, password: string): Promise<ApiUser
     method: "POST",
     body: JSON.stringify({ email, password }),
   })
-  return data.user as ApiUser
+  currentUser = data.user as ApiUser
+  return currentUser
 }
 
 export async function apiMe(): Promise<ApiUser | null> {
   try {
     const data = await call("/users/me")
-    return (data.user as ApiUser | null) ?? null
+    currentUser = (data.user as ApiUser | null) ?? null
+    return currentUser
   } catch {
     return null
   }
@@ -73,6 +75,7 @@ export async function apiMe(): Promise<ApiUser | null> {
 export async function apiLogout(): Promise<void> {
   try {
     await call("/users/logout", { method: "POST" })
+    currentUser = null
   } catch {
     /* ignore: the cookie is cleared or already expired */
   }
@@ -143,3 +146,6 @@ export async function apiLearners(): Promise<Learner[]> {
 export async function apiDelete(collection: string, id: number): Promise<void> {
   await call(`/${collection}/${id}`, { method: "DELETE" })
 }
+
+let currentUser: ApiUser | null = null
+export const getCurrentUser = () => currentUser

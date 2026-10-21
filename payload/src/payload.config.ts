@@ -17,6 +17,9 @@ import { GuardianLinks } from './collections/GuardianLinks'
 import { Staff } from './collections/Staff'
 import { TeacherAssignments } from './collections/TeacherAssignments'
 import { AuditLogs } from './collections/AuditLogs'
+import { Attendance } from './collections/Attendance'
+import { Assessments } from './collections/Assessments'
+import { Marks } from './collections/Marks'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,6 +50,9 @@ export default buildConfig({
     Staff,
     TeacherAssignments,
     AuditLogs,
+    Attendance,
+    Assessments,
+    Marks,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

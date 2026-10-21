@@ -50,6 +50,9 @@ import {
   portalForRole,
 } from "./api"
 import { hydrateLearners } from "./schoolStore"
+import { FamilyLive } from "./FamilyLive"
+import { TeacherLive } from "./TeacherLive"
+import { LiveTermBadge, LiveUserBadge } from "./LiveShell"
 
 type LoginKind = "student" | "teacher"
 type Portal = "login" | "student" | "teacher" | "admin"
@@ -560,6 +563,10 @@ function AppShell({
           ))}
         </nav>
         <div className="sidebar-user">
+          {API_ENABLED ? (
+            <LiveUserBadge />
+          ) : (
+            <>
           <div className="avatar">
             {portal === "student"
               ? (learner?.name
@@ -586,6 +593,8 @@ function AppShell({
                   : "Super administrator"}
             </span>
           </div>
+            </>
+          )}
           <button onClick={onLogout} aria-label="Log out">
             <ChevronDown size={16} />
           </button>
@@ -604,9 +613,13 @@ function AppShell({
             <h1>{page}</h1>
           </div>
           <div className="topbar-actions">
-            <button className="term-select">
-              Term 2, 2026 <ChevronDown size={15} />
-            </button>
+            {API_ENABLED ? (
+              <LiveTermBadge />
+            ) : (
+              <button className="term-select">
+                Term 2, 2026 <ChevronDown size={15} />
+              </button>
+            )}
             <div className="sync">
               <Wifi size={15} />
               <span>
@@ -624,7 +637,15 @@ function AppShell({
           </div>
         </header>
         <main className="portal-content">
-          {portal === "student" ? (
+          {API_ENABLED ? (
+            portal === "student" ? (
+              <FamilyLive page={page} />
+            ) : portal === "teacher" ? (
+              <TeacherLive page={page} />
+            ) : (
+              <AdminContent page={page} />
+            )
+          ) : portal === "student" ? (
             <>
               {page !== "More" && <StudentContent page={page} />}
               <StudentModule page={page} />

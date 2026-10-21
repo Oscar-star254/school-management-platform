@@ -31,6 +31,7 @@ import {
   UsersRolesLive,
 } from "./AdminPeople"
 import { LearningAreasLive, TermsClassesLive } from "./AdminAcademics"
+import { ResultsMonitorLive } from "./AdminResults"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
@@ -664,6 +665,8 @@ export function AdminContent({ page }: { page: string }) {
       return <TermsClassesLive />
     case "Learning areas":
       return <LearningAreasLive />
+    case "Results monitor":
+      return <ResultsMonitorLive />
     default:
       return <ComingSoon page={page} />
   }
