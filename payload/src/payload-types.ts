@@ -79,6 +79,9 @@ export interface Config {
     staff: Staff;
     'teacher-assignments': TeacherAssignment;
     'audit-logs': AuditLog;
+    attendance: Attendance;
+    assessments: Assessment;
+    marks: Mark;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +101,9 @@ export interface Config {
     staff: StaffSelect<false> | StaffSelect<true>;
     'teacher-assignments': TeacherAssignmentsSelect<false> | TeacherAssignmentsSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
+    attendance: AttendanceSelect<false> | AttendanceSelect<true>;
+    assessments: AssessmentsSelect<false> | AssessmentsSelect<true>;
+    marks: MarksSelect<false> | MarksSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -382,6 +388,57 @@ export interface AuditLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance".
+ */
+export interface Attendance {
+  id: number;
+  student: number | Student;
+  class: number | Class;
+  date: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  note?: string | null;
+  markedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessments".
+ */
+export interface Assessment {
+  id: number;
+  /**
+   * For example: End of Term 1 exam
+   */
+  name: string;
+  term: number | Term;
+  class: number | Class;
+  subject: number | Subject;
+  maxMarks: number;
+  status: 'open' | 'submitted' | 'approved' | 'published';
+  /**
+   * Why results were returned to the teacher.
+   */
+  rejectionNote?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marks".
+ */
+export interface Mark {
+  id: number;
+  assessment: number | Assessment;
+  student: number | Student;
+  score?: number | null;
+  comment?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -451,6 +508,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'audit-logs';
         value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'attendance';
+        value: number | Attendance;
+      } | null)
+    | ({
+        relationTo: 'assessments';
+        value: number | Assessment;
+      } | null)
+    | ({
+        relationTo: 'marks';
+        value: number | Mark;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -679,6 +748,48 @@ export interface AuditLogsSelect<T extends boolean = true> {
   actor?: T;
   summary?: T;
   changedFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance_select".
+ */
+export interface AttendanceSelect<T extends boolean = true> {
+  student?: T;
+  class?: T;
+  date?: T;
+  status?: T;
+  note?: T;
+  markedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessments_select".
+ */
+export interface AssessmentsSelect<T extends boolean = true> {
+  name?: T;
+  term?: T;
+  class?: T;
+  subject?: T;
+  maxMarks?: T;
+  status?: T;
+  rejectionNote?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marks_select".
+ */
+export interface MarksSelect<T extends boolean = true> {
+  assessment?: T;
+  student?: T;
+  score?: T;
+  comment?: T;
   updatedAt?: T;
   createdAt?: T;
 }
