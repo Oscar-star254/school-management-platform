@@ -140,3 +140,6 @@ export async function apiLearners(): Promise<Learner[]> {
     throw error
   }
 }
+export async function apiDelete(collection: string, id: number): Promise<void> {
+  await call(`/${collection}/${id}`, { method: "DELETE" })
+}

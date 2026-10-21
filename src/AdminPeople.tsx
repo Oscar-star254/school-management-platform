@@ -20,21 +20,21 @@ const ROLES: [string, string][] = [
 const STAFF_ROLES = ROLES.filter(([value]) => value !== "student" && value !== "parent")
 const roleLabel = (role?: string) => ROLES.find(([value]) => value === role)?.[1] ?? role ?? ""
 
-const errorText = (error: unknown) =>
+export const errorText = (error: unknown) =>
   error instanceof Error ? error.message : "Something went wrong"
 
-const relId = (value: unknown): number | undefined => {
+export const relId = (value: unknown): number | undefined => {
   if (typeof value === "number") return value
   if (value && typeof value === "object" && "id" in value) return (value as { id: number }).id
   return undefined
 }
 
-const nameOf = (value: unknown): string =>
+export const nameOf = (value: unknown): string =>
   value && typeof value === "object"
     ? String((value as { name?: string; email?: string }).name ?? (value as { email?: string }).email ?? "")
     : ""
 
-function useRows<T>(collection: string, query = "limit=200&depth=1&sort=-createdAt") {
+export function useRows<T>(collection: string, query = "limit=200&depth=1&sort=-createdAt") {
   const [rows, setRows] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -54,7 +54,7 @@ function useRows<T>(collection: string, query = "limit=200&depth=1&sort=-created
   return { rows, loading, error, reload }
 }
 
-function Page({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+export function Page({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
     <>
       <div className="page-heading module-heading">
@@ -68,7 +68,7 @@ function Page({ title, subtitle, children }: { title: string; subtitle: string; 
   )
 }
 
-function Note({ ok, error }: { ok?: string; error?: string }) {
+export function Note({ ok, error }: { ok?: string; error?: string }) {
   if (error)
     return (
       <span className="save-message" style={{ color: "#b3261e" }}>
@@ -84,14 +84,14 @@ function Note({ ok, error }: { ok?: string; error?: string }) {
   return null
 }
 
-function Empty({ loading, error, count, text }: { loading: boolean; error: string; count: number; text: string }) {
+export function Empty({ loading, error, count, text }: { loading: boolean; error: string; count: number; text: string }) {
   if (loading) return <p style={{ padding: 16 }}>Loading…</p>
   if (error) return <p style={{ padding: 16, color: "#b3261e" }}>{error}</p>
   if (count === 0) return <p style={{ padding: 16 }}>{text}</p>
   return null
 }
 
-type Msg = { ok?: string; err?: string }
+export type Msg = { ok?: string; err?: string }
 
 /* -------------------------------- Users & roles -------------------------------- */
 
