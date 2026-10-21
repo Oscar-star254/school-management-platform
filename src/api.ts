@@ -42,6 +42,16 @@ async function call(path: string, init: RequestInit = {}) {
   })
   const body = await response.json().catch(() => ({}))
   if (!response.ok) {
+    if ((response.status === 401 || response.status === 403) && currentUser && !path.startsWith("/users/")) {
+      const check = await fetch("/api/users/me", { credentials: "include" })
+        .then((r) => r.json())
+        .catch(() => null)
+      if (!check?.user) {
+        currentUser = null
+        window.dispatchEvent(new Event("school-session-expired"))
+        throw new ApiError("Your session has expired. Please sign in again.", 401)
+      }
+    }
     const first = body?.errors?.[0]
     const details = (first?.data?.errors as FieldError[] | undefined)
       ?.map((e) => `${e.path ?? e.field ?? "field"}: ${e.message ?? "invalid"}`)

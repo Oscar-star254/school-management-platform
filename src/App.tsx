@@ -1427,6 +1427,15 @@ export default function App() {
   const [checking, setChecking] = useState(API_ENABLED)
   useEffect(() => {
     if (!API_ENABLED) return
+    const onExpired = () => {
+      hydrateLearners([])
+      setPortal("login")
+    }
+    window.addEventListener("school-session-expired", onExpired)
+    return () => window.removeEventListener("school-session-expired", onExpired)
+  }, [])
+  useEffect(() => {
+    if (!API_ENABLED) return
     let cancelled = false
     apiMe()
       .then(async (user) => {
