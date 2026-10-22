@@ -39,6 +39,18 @@ export const GuardianLinks: CollectionConfig = {
         if (existing.totalDocs > 0) {
           throw new APIError('This guardian is already linked to that student.', 400, null, true)
         }
+        const others: Record<string, unknown>[] = [{ student: { equals: relId(merged.student) } }]
+        if (originalDoc?.id) others.push({ id: { not_equals: originalDoc.id } })
+        const siblings = await req.payload.find({
+          collection: 'guardian-links',
+          where: { and: others } as never,
+          limit: 1,
+          depth: 0,
+          req,
+        })
+        if (siblings.totalDocs >= 2) {
+          throw new APIError('A learner can have at most two guardians.', 400, null, true)
+        }
         return data
       },
     ],

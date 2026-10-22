@@ -7,6 +7,7 @@ type Ctx = Record<string, unknown>
 
 /** Keeps query constraints typed as `Where` so mixed return shapes compile. */
 const scope = (where: Where): Where => where
+const NONE: Where = { id: { equals: 0 } }
 
 /** Runs `load` once per request for a key (cached on req.context). */
 const cached = <T>(req: PayloadRequest, key: string, load: () => Promise<T>): Promise<T> => {
@@ -127,12 +128,12 @@ export const studentsRead: Access = async ({ req }) => {
   if (hasRole(user, ...ADMIN_PANEL_ROLES)) return true
   if (hasRole(user, ...TEACHING_ROLES)) {
     const classIds = await getTaughtClassIds(req, user)
-    return classIds.length ? scope({ currentClass: { in: classIds } }) : false
+    return classIds.length ? scope({ currentClass: { in: classIds } }) : NONE
   }
   if (hasRole(user, 'student')) return scope({ user: { equals: user.id } })
   if (hasRole(user, 'parent')) {
     const ids = await getLinkedStudentIds(req, user)
-    return ids.length ? scope({ id: { in: ids } }) : false
+    return ids.length ? scope({ id: { in: ids } }) : NONE
   }
   return false
 }
@@ -167,7 +168,7 @@ export const guardiansRead: Access = async ({ req }) => {
   if (hasRole(user, ...TEACHING_ROLES)) {
     const classIds = await getClassTeacherClassIds(req, user)
     const guardianIds = await getGuardianIdsForClasses(req, user, classIds)
-    return guardianIds.length ? scope({ id: { in: guardianIds } }) : false
+    return guardianIds.length ? scope({ id: { in: guardianIds } }) : NONE
   }
   return false
 }
@@ -190,7 +191,7 @@ export const guardianLinksRead: Access = async ({ req }) => {
   if (hasRole(user, ...ADMIN_PANEL_ROLES)) return true
   if (hasRole(user, 'parent')) {
     const guardianIds = await getOwnGuardianIds(req, user)
-    return guardianIds.length ? { guardian: { in: guardianIds } } : false
+    return guardianIds.length ? scope({ guardian: { in: guardianIds } }) : NONE
   }
   return false
 }

@@ -64,9 +64,10 @@ async function call(path: string, init: RequestInit = {}) {
 }
 
 export async function apiLogin(email: string, password: string): Promise<ApiUser> {
-  const data = await call("/users/login", {
+  const byEmail = email.includes("@")
+  const data = await call(byEmail ? "/users/login" : "/family-login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(byEmail ? { email, password } : { identifier: email, password }),
   })
   currentUser = data.user as ApiUser
   return currentUser
@@ -159,3 +160,20 @@ export async function apiDelete(collection: string, id: number): Promise<void> {
 
 let currentUser: ApiUser | null = null
 export const getCurrentUser = () => currentUser
+
+export type FamilyRegistration = {
+  firstName: string
+  lastName: string
+  dateOfBirth?: string
+  classId?: number
+  password?: string
+  createStudentLogin?: boolean
+  studentEmail?: string
+  guardians: { existingId?: number; name?: string; phone?: string; email?: string; relationship?: string }[]
+}
+
+/** Registers a learner and up to two guardians in one step. */
+export async function apiRegisterFamily(body: FamilyRegistration) {
+  const data = await call("/register-family", { method: "POST", body: JSON.stringify(body) })
+  return data as { admissionNumber: string; studentId: number; accounts: { name: string; signIn: string }[] }
+}

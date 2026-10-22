@@ -305,7 +305,7 @@ function LoginPanel({
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 placeholder={
-                  kind === "student" ? "e.g. DEMO-1042" : "e.g. t.wafula"
+                  kind === "student" ? "Admission number or email" : "Your email address"
                 }
                 autoComplete="username"
                 onFocus={onActivate}

@@ -14,6 +14,7 @@ const cached = <T>(req: PayloadRequest, key: string, load: () => Promise<T>): Pr
   return ctx[key] as Promise<T>
 }
 const scope = (where: Where): Where => where
+const NONE: Where = { id: { equals: 0 } }
 const unique = (ids: (number | undefined)[]): number[] => [
   ...new Set(ids.filter((id): id is number => typeof id === 'number')),
 ]
@@ -141,10 +142,10 @@ export const attendanceRead: Access = async ({ req }) => {
   if (hasRole(user, ...ACADEMIC_MANAGERS)) return true
   if (hasRole(user, ...TEACHING_ROLES)) {
     const classIds = await getTaughtClassIds(req, user)
-    return classIds.length ? scope({ class: { in: classIds } }) : false
+    return classIds.length ? scope({ class: { in: classIds } }) : NONE
   }
   const studentIds = await getChildStudentIds(req, user)
-  return studentIds.length ? scope({ student: { in: studentIds } }) : false
+  return studentIds.length ? scope({ student: { in: studentIds } }) : NONE
 }
 
 export const attendanceWrite: Access = async ({ req }) => {
@@ -170,10 +171,10 @@ export const assessmentsRead: Access = async ({ req }) => {
   if (hasRole(user, ...ACADEMIC_MANAGERS)) return true
   if (hasRole(user, ...TEACHING_ROLES)) {
     const ids = await getReadableAssessmentIds(req, user)
-    return ids.length ? scope({ id: { in: ids } }) : false
+    return ids.length ? scope({ id: { in: ids } }) : NONE
   }
   const ids = await getPublishedAssessmentIds(req, user)
-  return ids.length ? scope({ id: { in: ids } }) : false
+  return ids.length ? scope({ id: { in: ids } }) : NONE
 }
 
 export const assessmentsUpdate: Access = async ({ req }) => {
@@ -197,13 +198,13 @@ export const marksRead: Access = async ({ req }) => {
   if (hasRole(user, ...ACADEMIC_MANAGERS)) return true
   if (hasRole(user, ...TEACHING_ROLES)) {
     const ids = await getReadableAssessmentIds(req, user)
-    return ids.length ? scope({ assessment: { in: ids } }) : false
+    return ids.length ? scope({ assessment: { in: ids } }) : NONE
   }
   const [studentIds, publishedIds] = await Promise.all([
     getChildStudentIds(req, user),
     getPublishedAssessmentIds(req, user),
   ])
-  if (!studentIds.length || !publishedIds.length) return false
+  if (!studentIds.length || !publishedIds.length) return NONE
   return scope({
     and: [{ student: { in: studentIds } }, { assessment: { in: publishedIds } }],
   })

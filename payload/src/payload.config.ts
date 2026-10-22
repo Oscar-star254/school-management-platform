@@ -20,6 +20,8 @@ import { AuditLogs } from './collections/AuditLogs'
 import { Attendance } from './collections/Attendance'
 import { Assessments } from './collections/Assessments'
 import { Marks } from './collections/Marks'
+import { familyLogin } from './endpoints/familyLogin'
+import { registerFamily } from './endpoints/registerFamily'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -68,4 +70,5 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
+  endpoints: [familyLogin, registerFamily],
 })
