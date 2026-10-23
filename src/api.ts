@@ -177,3 +177,12 @@ export async function apiRegisterFamily(body: FamilyRegistration) {
   const data = await call("/register-family", { method: "POST", body: JSON.stringify(body) })
   return data as { admissionNumber: string; studentId: number; accounts: { name: string; signIn: string }[] }
 }
+
+/** Reads a school-wide settings record. */
+export async function apiGlobal<T>(slug: string): Promise<T> {
+  return (await call(`/globals/${slug}`)) as T
+}
+
+export async function apiSaveGlobal(slug: string, data: Record<string, unknown>): Promise<void> {
+  await call(`/globals/${slug}`, { method: "POST", body: JSON.stringify(data) })
+}

@@ -6,6 +6,7 @@ import { apiCreate, apiUpdate } from "./api"
 import { ComingSoon, Empty, Note, Page, errorText, nameOf, relId } from "./AdminPeople"
 import type { Msg } from "./AdminPeople"
 import { Field, STATUS_LABELS, Table, todayLocal, useFind } from "./LiveShell"
+import { NoticesManage } from "./Notices"
 
 type Student = { id: number; admissionNumber?: string; name?: string; status?: string; currentClass?: unknown }
 type Assignment = { id: number; class?: unknown; subject?: unknown; academicYear?: unknown }
@@ -464,6 +465,8 @@ export function TeacherLive({ page }: { page: string }) {
       return <TeacherAttendance />
     case "Results":
       return <TeacherResults />
+    case "Notices":
+      return <NoticesManage teacher />
     default:
       return <ComingSoon page={page} />
   }

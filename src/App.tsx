@@ -53,6 +53,7 @@ import { hydrateLearners } from "./schoolStore"
 import { FamilyLive } from "./FamilyLive"
 import { TeacherLive } from "./TeacherLive"
 import { LiveTermBadge, LiveUserBadge } from "./LiveShell"
+import { loadSchoolSettings } from "./settingsData"
 
 type LoginKind = "student" | "teacher"
 type Portal = "login" | "student" | "teacher" | "admin"
@@ -1425,6 +1426,9 @@ export default function App() {
       : "login"
   })
   const [checking, setChecking] = useState(API_ENABLED)
+  useEffect(() => {
+    if (API_ENABLED) void loadSchoolSettings()
+  }, [])
   useEffect(() => {
     if (!API_ENABLED) return
     const onExpired = () => {

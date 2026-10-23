@@ -14,19 +14,25 @@ export type AttendanceSummary = { total: number; attended: number; absent: numbe
 
 const obj = (value: unknown) => (value && typeof value === "object" ? (value as Record<string, unknown>) : undefined)
 
-export const levelFor = (percent: number | null) =>
-  percent === null ? "—" : percent >= 75 ? "EE" : percent >= 41 ? "ME" : percent >= 21 ? "AE" : "BE"
+export type GradeBand = { label: string; minPercent: number; remark?: string | null }
 
-export const remarkFor = (percent: number | null) =>
-  percent === null
-    ? "Pending"
-    : percent >= 75
-      ? "Exceeds expectations"
-      : percent >= 41
-        ? "Meets expectations"
-        : percent >= 21
-          ? "Approaches expectations"
-          : "Needs support"
+let bands: GradeBand[] = [
+  { label: "EE", minPercent: 75, remark: "Exceeds expectations" },
+  { label: "ME", minPercent: 41, remark: "Meets expectations" },
+  { label: "AE", minPercent: 21, remark: "Approaches expectations" },
+  { label: "BE", minPercent: 0, remark: "Needs support" },
+]
+
+/** The school's grading levels (set from School Settings). */
+export function setGradeBands(next: GradeBand[]) {
+  if (next.length) bands = [...next].sort((a, b) => b.minPercent - a.minPercent)
+}
+
+const bandFor = (percent: number) => bands.find((band) => percent >= band.minPercent) ?? bands[bands.length - 1]
+
+export const levelFor = (percent: number | null) => (percent === null ? "—" : bandFor(percent).label)
+
+export const remarkFor = (percent: number | null) => (percent === null ? "Pending" : (bandFor(percent).remark ?? ""))
 
 /** Only results that the school has published. */
 export const publishedMarks = (marks: MarkDoc[]) => marks.filter((mark) => obj(mark.assessment)?.status === "published")

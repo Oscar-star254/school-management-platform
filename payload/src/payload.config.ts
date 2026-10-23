@@ -22,6 +22,13 @@ import { Assessments } from './collections/Assessments'
 import { Marks } from './collections/Marks'
 import { familyLogin } from './endpoints/familyLogin'
 import { registerFamily } from './endpoints/registerFamily'
+import { Notices } from './collections/Notices'
+import { NoticeReads } from './collections/NoticeReads'
+import { Events } from './collections/Events'
+import { TimetableSlots } from './collections/TimetableSlots'
+import { Assignments } from './collections/Assignments'
+import { AssignmentSubmissions } from './collections/AssignmentSubmissions'
+import { SchoolSettings } from './globals/SchoolSettings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -55,6 +62,12 @@ export default buildConfig({
     Attendance,
     Assessments,
     Marks,
+    Notices,
+    NoticeReads,
+    Events,
+    TimetableSlots,
+    Assignments,
+    AssignmentSubmissions,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -71,4 +84,5 @@ export default buildConfig({
   sharp,
   plugins: [],
   endpoints: [familyLogin, registerFamily],
+  globals: [SchoolSettings],
 })

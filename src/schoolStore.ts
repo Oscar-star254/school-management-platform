@@ -244,3 +244,13 @@ export function hydrateLearners(learners: Learner[]) {
   }
   listeners.forEach((listener) => listener())
 }
+
+/** Applies the school's saved name and motto (from School Settings). */
+export function hydrateSchool(settings: { schoolName?: string | null; motto?: string | null }) {
+  state = {
+    ...state,
+    schoolName: settings.schoolName || state.schoolName,
+    motto: settings.motto || state.motto,
+  }
+  listeners.forEach((listener) => listener())
+}
