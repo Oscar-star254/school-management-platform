@@ -82,6 +82,12 @@ export interface Config {
     attendance: Attendance;
     assessments: Assessment;
     marks: Mark;
+    notices: Notice;
+    'notice-reads': NoticeRead;
+    events: Event;
+    'timetable-slots': TimetableSlot;
+    assignments: Assignment;
+    'assignment-submissions': AssignmentSubmission;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -104,6 +110,12 @@ export interface Config {
     attendance: AttendanceSelect<false> | AttendanceSelect<true>;
     assessments: AssessmentsSelect<false> | AssessmentsSelect<true>;
     marks: MarksSelect<false> | MarksSelect<true>;
+    notices: NoticesSelect<false> | NoticesSelect<true>;
+    'notice-reads': NoticeReadsSelect<false> | NoticeReadsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'timetable-slots': TimetableSlotsSelect<false> | TimetableSlotsSelect<true>;
+    assignments: AssignmentsSelect<false> | AssignmentsSelect<true>;
+    'assignment-submissions': AssignmentSubmissionsSelect<false> | AssignmentSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -113,8 +125,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'school-settings': SchoolSetting;
+  };
+  globalsSelect: {
+    'school-settings': SchoolSettingsSelect<false> | SchoolSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -439,6 +455,116 @@ export interface Mark {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notices".
+ */
+export interface Notice {
+  id: number;
+  title: string;
+  body: string;
+  audience: 'all' | 'role' | 'class';
+  audienceRole?: ('staff' | 'teachers' | 'parents' | 'students') | null;
+  audienceClass?: (number | null) | Class;
+  status: 'draft' | 'published' | 'archived';
+  /**
+   * Leave empty to publish immediately. A future time schedules the notice.
+   */
+  publishAt?: string | null;
+  publishedAt?: string | null;
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notice-reads".
+ */
+export interface NoticeRead {
+  id: number;
+  notice: number | Notice;
+  user?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  type: 'event' | 'exam' | 'holiday' | 'deadline';
+  startDate: string;
+  endDate?: string | null;
+  /**
+   * Leave empty for the whole school.
+   */
+  class?: (number | null) | Class;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetable-slots".
+ */
+export interface TimetableSlot {
+  id: number;
+  class: number | Class;
+  subject: number | Subject;
+  teacher: number | User;
+  dayOfWeek: 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
+  /**
+   * For example 08:30
+   */
+  startTime: string;
+  /**
+   * For example 09:10
+   */
+  endTime: string;
+  room?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignments".
+ */
+export interface Assignment {
+  id: number;
+  title: string;
+  instructions?: string | null;
+  class: number | Class;
+  subject: number | Subject;
+  dueDate: string;
+  maxMarks?: number | null;
+  /**
+   * Let learners hand in after the deadline (marked as late).
+   */
+  allowLate?: boolean | null;
+  status: 'draft' | 'published' | 'archived';
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignment-submissions".
+ */
+export interface AssignmentSubmission {
+  id: number;
+  assignment: number | Assignment;
+  student: number | Student;
+  text?: string | null;
+  submittedAt?: string | null;
+  late?: boolean | null;
+  marks?: number | null;
+  feedback?: string | null;
+  markedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -520,6 +646,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'marks';
         value: number | Mark;
+      } | null)
+    | ({
+        relationTo: 'notices';
+        value: number | Notice;
+      } | null)
+    | ({
+        relationTo: 'notice-reads';
+        value: number | NoticeRead;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'timetable-slots';
+        value: number | TimetableSlot;
+      } | null)
+    | ({
+        relationTo: 'assignments';
+        value: number | Assignment;
+      } | null)
+    | ({
+        relationTo: 'assignment-submissions';
+        value: number | AssignmentSubmission;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -795,6 +945,95 @@ export interface MarksSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notices_select".
+ */
+export interface NoticesSelect<T extends boolean = true> {
+  title?: T;
+  body?: T;
+  audience?: T;
+  audienceRole?: T;
+  audienceClass?: T;
+  status?: T;
+  publishAt?: T;
+  publishedAt?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notice-reads_select".
+ */
+export interface NoticeReadsSelect<T extends boolean = true> {
+  notice?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  type?: T;
+  startDate?: T;
+  endDate?: T;
+  class?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetable-slots_select".
+ */
+export interface TimetableSlotsSelect<T extends boolean = true> {
+  class?: T;
+  subject?: T;
+  teacher?: T;
+  dayOfWeek?: T;
+  startTime?: T;
+  endTime?: T;
+  room?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignments_select".
+ */
+export interface AssignmentsSelect<T extends boolean = true> {
+  title?: T;
+  instructions?: T;
+  class?: T;
+  subject?: T;
+  dueDate?: T;
+  maxMarks?: T;
+  allowLate?: T;
+  status?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignment-submissions_select".
+ */
+export interface AssignmentSubmissionsSelect<T extends boolean = true> {
+  assignment?: T;
+  student?: T;
+  text?: T;
+  submittedAt?: T;
+  late?: T;
+  marks?: T;
+  feedback?: T;
+  markedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -832,6 +1071,63 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-settings".
+ */
+export interface SchoolSetting {
+  id: number;
+  schoolName: string;
+  motto?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  /**
+   * Shown on report forms.
+   */
+  principalName?: string | null;
+  /**
+   * A line printed at the bottom of every report form.
+   */
+  reportFooter?: string | null;
+  /**
+   * A result at or above the minimum percentage earns that level. Highest first.
+   */
+  gradeBands?:
+    | {
+        label: string;
+        minPercent: number;
+        remark?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-settings_select".
+ */
+export interface SchoolSettingsSelect<T extends boolean = true> {
+  schoolName?: T;
+  motto?: T;
+  phone?: T;
+  email?: T;
+  address?: T;
+  principalName?: T;
+  reportFooter?: T;
+  gradeBands?:
+    | T
+    | {
+        label?: T;
+        minPercent?: T;
+        remark?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
