@@ -7,6 +7,8 @@ import { ComingSoon, Empty, Note, Page, errorText, nameOf, relId } from "./Admin
 import type { Msg } from "./AdminPeople"
 import { Field, STATUS_LABELS, Table, todayLocal, useFind } from "./LiveShell"
 import { NoticesManage } from "./Notices"
+import { TeacherAssignments } from "./AssignmentsLive"
+import { TimetableView } from "./Timetable"
 
 type Student = { id: number; admissionNumber?: string; name?: string; status?: string; currentClass?: unknown }
 type Assignment = { id: number; class?: unknown; subject?: unknown; academicYear?: unknown }
@@ -467,6 +469,10 @@ export function TeacherLive({ page }: { page: string }) {
       return <TeacherResults />
     case "Notices":
       return <NoticesManage teacher />
+    case "Assignments":
+      return <TeacherAssignments />
+    case "Timetable":
+      return <TimetableView showClass />
     default:
       return <ComingSoon page={page} />
   }

@@ -17,6 +17,7 @@ import {
 import type { AttendanceDoc, MarkDoc, TermInfo } from "./resultsData"
 import { useSchoolStore } from "./schoolStore"
 import { NoticesInbox } from "./Notices"
+import { FamilyMore } from "./FamilyMore"
 
 type Child = { id: number; name?: string; admissionNumber?: string; status?: string; currentClass?: unknown }
 
@@ -199,6 +200,7 @@ export function FamilyLive({ page }: { page: string }) {
   else if (page === "Results") content = <FamilyResults key={child.id} child={child} />
   else if (page === "Reports") content = <FamilyReports key={child.id} child={child} />
   else if (page === "Notices") content = <NoticesInbox key={child.id} />
+  else if (page === "More") content = <FamilyMore key={child.id} child={child} />
   else content = <ComingSoon page={page} />
 
   return (

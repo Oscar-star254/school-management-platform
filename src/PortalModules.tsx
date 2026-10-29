@@ -36,6 +36,7 @@ import { ReportFormsLive } from "./AdminReports"
 import { GuardiansByClass, LearnersPage } from "./AdminFamilies"
 import { NoticesManage } from "./Notices"
 import { SettingsLive } from "./AdminSettings"
+import { TimetableAdmin } from "./Timetable"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
@@ -677,6 +678,8 @@ export function AdminContent({ page }: { page: string }) {
       return <NoticesManage />
     case "Settings":
       return <SettingsLive />
+    case "Timetable":
+      return <TimetableAdmin />
     default:
       return <ComingSoon page={page} />
   }
