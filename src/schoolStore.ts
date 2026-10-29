@@ -91,7 +91,7 @@ const initialState: SchoolState = {
   ),
 }
 
-const serverInitialState: SchoolState = { ...initialState, learners: [], marks: {} }
+const serverInitialState: SchoolState = { ...initialState, learners: [], marks: {}, schoolName: "", motto: "" }
 
 function guardDemo() {
   if (API_ENABLED)
@@ -250,7 +250,7 @@ export function hydrateSchool(settings: { schoolName?: string | null; motto?: st
   state = {
     ...state,
     schoolName: settings.schoolName || state.schoolName,
-    motto: settings.motto || state.motto,
+    motto: settings.motto ?? "",
   }
   listeners.forEach((listener) => listener())
 }

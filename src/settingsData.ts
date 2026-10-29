@@ -1,5 +1,5 @@
 import { apiGlobal } from "./api"
-import { setGradeBands } from "./resultsData"
+import { setGradeBands, setReportProfile } from "./resultsData"
 import type { GradeBand } from "./resultsData"
 import { hydrateSchool } from "./schoolStore"
 
@@ -17,6 +17,14 @@ export type SchoolSettingsDoc = {
 /** Puts the school's saved name, motto and grading levels to work across the whole app. */
 export function applySchoolSettings(settings: SchoolSettingsDoc) {
   hydrateSchool({ schoolName: settings.schoolName, motto: settings.motto })
+  if (settings.schoolName) document.title = settings.schoolName
+  setReportProfile({
+    principalName: settings.principalName,
+    reportFooter: settings.reportFooter,
+    phone: settings.phone,
+    email: settings.email,
+    address: settings.address,
+  })
   if (settings.gradeBands?.length) setGradeBands(settings.gradeBands)
 }
 

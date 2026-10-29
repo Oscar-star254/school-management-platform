@@ -107,6 +107,14 @@ export function attendanceQuery(studentId: number, term?: TermInfo): string {
 export const fetchAttendance = (studentId: number, term?: TermInfo) =>
   apiFind<AttendanceDoc>("attendance", attendanceQuery(studentId, term))
 
+export type ReportProfile = { principalName?: string | null; reportFooter?: string | null; phone?: string | null; email?: string | null; address?: string | null }
+let profile: ReportProfile = {}
+
+/** Details from School Settings that are printed on every report form. */
+export function setReportProfile(next: ReportProfile) {
+  profile = next
+}
+
 export async function downloadLiveReport(options: {
   schoolName: string
   learner: { name: string; admission: string; className: string }
@@ -120,6 +128,13 @@ export async function downloadLiveReport(options: {
   doc.setFont("helvetica", "bold")
   doc.setFontSize(18)
   doc.text(schoolName.toUpperCase(), 105, 20, { align: "center" })
+  const contact = [profile.address?.replace(/\s*\n\s*/g, ", "), profile.phone, profile.email].filter(Boolean).join("  |  ")
+  if (contact) {
+    doc.setFontSize(8)
+    doc.setFont("helvetica", "normal")
+    doc.text(contact, 105, 25, { align: "center" })
+    doc.setFont("helvetica", "bold")
+  }
   doc.setFontSize(14)
   doc.text("Learner Progress Report", 105, 30, { align: "center" })
   doc.setFont("helvetica", "normal")
@@ -148,6 +163,9 @@ export async function downloadLiveReport(options: {
   if (attendance && attendance.total > 0) {
     doc.text(`Attendance: ${attendance.attended} of ${attendance.total} recorded days (${attendance.percent}%)`, 20, end + 24)
   }
-  doc.text(`Issued ${new Date().toLocaleDateString("en-KE")} from the school system.`, 20, 274)
+  doc.setFontSize(10)
+  if (profile.principalName) doc.text(`Head teacher: ${profile.principalName}`, 20, 252)
+  if (profile.reportFooter) doc.text(doc.splitTextToSize(profile.reportFooter, 170), 20, 262)
+  doc.text(`Issued ${new Date().toLocaleDateString("en-KE")} from the school system.`, 20, 282)
   doc.save(`${learner.name.replace(/ /g, "-")}-${termName.replace(/ /g, "-")}.pdf`)
 }

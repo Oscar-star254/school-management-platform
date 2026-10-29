@@ -283,6 +283,7 @@ function LoginPanel({
     if (ready) onLogin(username, remember, password)
   }
 
+  const { schoolName } = useSchoolStore()
   return (
     <section
       className={`login-panel ${active ? "active" : "inactive"}`}
@@ -290,6 +291,11 @@ function LoginPanel({
     >
       <div className="login-content">
         <LoginIllustration kind={kind} />
+        {API_ENABLED && schoolName && (
+          <p className="register-copy">
+            <strong>{schoolName}</strong>
+          </p>
+        )}
         <h1>{kind === "student" ? "Student Login" : "Teacher Login"}</h1>
         <p className="register-copy">
           Not registered?{" "}
