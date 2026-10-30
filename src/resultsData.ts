@@ -115,6 +115,8 @@ export function setReportProfile(next: ReportProfile) {
   profile = next
 }
 
+export const getReportProfile = () => profile
+
 export async function downloadLiveReport(options: {
   schoolName: string
   learner: { name: string; admission: string; className: string }

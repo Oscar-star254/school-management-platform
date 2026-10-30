@@ -88,6 +88,10 @@ export interface Config {
     'timetable-slots': TimetableSlot;
     assignments: Assignment;
     'assignment-submissions': AssignmentSubmission;
+    'fee-structures': FeeStructure;
+    invoices: Invoice;
+    payments: Payment;
+    'fee-adjustments': FeeAdjustment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -116,6 +120,10 @@ export interface Config {
     'timetable-slots': TimetableSlotsSelect<false> | TimetableSlotsSelect<true>;
     assignments: AssignmentsSelect<false> | AssignmentsSelect<true>;
     'assignment-submissions': AssignmentSubmissionsSelect<false> | AssignmentSubmissionsSelect<true>;
+    'fee-structures': FeeStructuresSelect<false> | FeeStructuresSelect<true>;
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>;
+    payments: PaymentsSelect<false> | PaymentsSelect<true>;
+    'fee-adjustments': FeeAdjustmentsSelect<false> | FeeAdjustmentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -565,6 +573,88 @@ export interface AssignmentSubmission {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-structures".
+ */
+export interface FeeStructure {
+  id: number;
+  /**
+   * For example: Grade 4 Term 1 fees
+   */
+  name: string;
+  term: number | Term;
+  class: number | Class;
+  items: {
+    name: string;
+    amount: number;
+    id?: string | null;
+  }[];
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: number;
+  number?: string | null;
+  student: number | Student;
+  term: number | Term;
+  structure?: (number | null) | FeeStructure;
+  lines: {
+    description: string;
+    /**
+     * Use a negative amount for a discount.
+     */
+    amount: number;
+    id?: string | null;
+  }[];
+  total?: number | null;
+  status?: ('issued' | 'void') | null;
+  voidReason?: string | null;
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments".
+ */
+export interface Payment {
+  id: number;
+  receiptNumber?: string | null;
+  student: number | Student;
+  amount: number;
+  method: 'cash' | 'mpesa' | 'bank' | 'cheque' | 'other';
+  reference?: string | null;
+  paidAt: string;
+  note?: string | null;
+  status?: ('valid' | 'reversed') | null;
+  reversalReason?: string | null;
+  recordedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-adjustments".
+ */
+export interface FeeAdjustment {
+  id: number;
+  student: number | Student;
+  /**
+   * Negative lowers the balance (a discount or waiver). Positive adds a charge.
+   */
+  amount: number;
+  reason: string;
+  date: string;
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -670,6 +760,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'assignment-submissions';
         value: number | AssignmentSubmission;
+      } | null)
+    | ({
+        relationTo: 'fee-structures';
+        value: number | FeeStructure;
+      } | null)
+    | ({
+        relationTo: 'invoices';
+        value: number | Invoice;
+      } | null)
+    | ({
+        relationTo: 'payments';
+        value: number | Payment;
+      } | null)
+    | ({
+        relationTo: 'fee-adjustments';
+        value: number | FeeAdjustment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1029,6 +1135,79 @@ export interface AssignmentSubmissionsSelect<T extends boolean = true> {
   marks?: T;
   feedback?: T;
   markedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-structures_select".
+ */
+export interface FeeStructuresSelect<T extends boolean = true> {
+  name?: T;
+  term?: T;
+  class?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        amount?: T;
+        id?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  number?: T;
+  student?: T;
+  term?: T;
+  structure?: T;
+  lines?:
+    | T
+    | {
+        description?: T;
+        amount?: T;
+        id?: T;
+      };
+  total?: T;
+  status?: T;
+  voidReason?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments_select".
+ */
+export interface PaymentsSelect<T extends boolean = true> {
+  receiptNumber?: T;
+  student?: T;
+  amount?: T;
+  method?: T;
+  reference?: T;
+  paidAt?: T;
+  note?: T;
+  status?: T;
+  reversalReason?: T;
+  recordedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fee-adjustments_select".
+ */
+export interface FeeAdjustmentsSelect<T extends boolean = true> {
+  student?: T;
+  amount?: T;
+  reason?: T;
+  date?: T;
+  createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }

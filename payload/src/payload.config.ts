@@ -29,6 +29,11 @@ import { TimetableSlots } from './collections/TimetableSlots'
 import { Assignments } from './collections/Assignments'
 import { AssignmentSubmissions } from './collections/AssignmentSubmissions'
 import { SchoolSettings } from './globals/SchoolSettings'
+import { FeeStructures } from './collections/FeeStructures'
+import { Invoices } from './collections/Invoices'
+import { Payments } from './collections/Payments'
+import { FeeAdjustments } from './collections/FeeAdjustments'
+import { generateInvoices } from './endpoints/generateInvoices'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -68,6 +73,10 @@ export default buildConfig({
     TimetableSlots,
     Assignments,
     AssignmentSubmissions,
+    FeeStructures,
+    Invoices,
+    Payments,
+    FeeAdjustments,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -83,6 +92,6 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
-  endpoints: [familyLogin, registerFamily],
+  endpoints: [familyLogin, registerFamily, generateInvoices],
   globals: [SchoolSettings],
 })

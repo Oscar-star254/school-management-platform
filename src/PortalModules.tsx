@@ -37,6 +37,7 @@ import { GuardiansByClass, LearnersPage } from "./AdminFamilies"
 import { NoticesManage } from "./Notices"
 import { SettingsLive } from "./AdminSettings"
 import { TimetableAdmin } from "./Timetable"
+import { FeeStructuresLive, InvoicesLive, PaymentsLive, ReconciliationLive } from "./Finance"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
@@ -680,6 +681,14 @@ export function AdminContent({ page }: { page: string }) {
       return <SettingsLive />
     case "Timetable":
       return <TimetableAdmin />
+    case "Fee structures":
+      return <FeeStructuresLive />
+    case "Invoices":
+      return <InvoicesLive />
+    case "Payments":
+      return <PaymentsLive />
+    case "Reconciliation":
+      return <ReconciliationLive />
     default:
       return <ComingSoon page={page} />
   }

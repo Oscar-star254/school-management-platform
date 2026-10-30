@@ -186,3 +186,9 @@ export async function apiGlobal<T>(slug: string): Promise<T> {
 export async function apiSaveGlobal(slug: string, data: Record<string, unknown>): Promise<void> {
   await call(`/globals/${slug}`, { method: "POST", body: JSON.stringify(data) })
 }
+
+/** Creates an invoice for every active learner in a fee structure's class. Safe to run twice. */
+export async function apiGenerateInvoices(structureId: number) {
+  const data = await call("/generate-invoices", { method: "POST", body: JSON.stringify({ structureId }) })
+  return data as { created: number; skipped: number }
+}
