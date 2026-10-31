@@ -55,7 +55,7 @@ export function WeekGrid({ slots, showClass, showTeacher }: { slots: Slot[]; sho
       {DAYS.map(([key, label]) => {
         const list = slots.filter((slot) => slot.dayOfWeek === key).sort((a, b) => a.startTime.localeCompare(b.startTime))
         return (
-          <div key={key} className="content-card" style={{ padding: 12, outline: key === today ? "2px solid #2fb36d" : undefined }}>
+          <div key={key} className="content-card" style={{ padding: 12, outline: key === today ? "2px solid var(--primary)" : undefined }}>
             <strong>
               {label}
               {key === today ? " (today)" : ""}

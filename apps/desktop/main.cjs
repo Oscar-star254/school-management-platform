@@ -7,7 +7,7 @@ function createWindow() {
     height: 820,
     minWidth: 900,
     minHeight: 640,
-    title: "Greenfield Academy",
+    title: "Smartschool",
     webPreferences: { contextIsolation: true, sandbox: true },
   })
   window.loadFile(path.join(__dirname, "../../dist/index.html"))

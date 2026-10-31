@@ -1,5 +1,5 @@
 appId: ke.ac.greenfield.school
-productName: Greenfield Academy
+productName: Smartschool
 directories:
   output: ../../release/desktop
 files:

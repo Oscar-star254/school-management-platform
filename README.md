@@ -1,4 +1,6 @@
-# Greenfield School Platform
+# Smartschool
+
+Smartschool is the school management app for Smart Schools Kindergarten.
 
 Responsive, installable school management product for a single Kenyan CBC school. It includes role-routed learner, teacher, and administration portals, offline shell caching, representative learner records, results, downloadable report PDFs, notices, fees, teacher attendance, score entry, academic administration, finance, audit, and device views.
 

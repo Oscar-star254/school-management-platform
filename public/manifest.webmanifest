@@ -1,11 +1,11 @@
 {
-  "name": "Greenfield School Platform",
-  "short_name": "Greenfield",
-  "description": "Offline-ready learner, teacher and school administration portal.",
+  "name": "Smartschool",
+  "short_name": "Smartschool",
+  "description": "Offline-ready learner, teacher and school administration portal for Smart Schools Kindergarten.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f8fa",
-  "theme_color": "#2fb36d",
+  "theme_color": "#3478c8",
   "icons": [
     { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]

@@ -17,7 +17,8 @@ export type SchoolSettingsDoc = {
 /** Puts the school's saved name, motto and grading levels to work across the whole app. */
 export function applySchoolSettings(settings: SchoolSettingsDoc) {
   hydrateSchool({ schoolName: settings.schoolName, motto: settings.motto })
-  if (settings.schoolName) document.title = settings.schoolName
+  if (settings.schoolName)
+    document.title = `Smartschool | ${settings.schoolName}`
   setReportProfile({
     principalName: settings.principalName,
     reportFooter: settings.reportFooter,

@@ -143,7 +143,7 @@ function LoginIllustration({ kind }: { kind: LoginKind }) {
         <g>
           <path
             d="M113 121c-16 4-23 22-23 45v23h25l5-64zM187 121c16 4 23 22 23 45v23h-25l-5-64z"
-            fill="#36ad68"
+            fill="#4c83c7"
           />
           <path d="M124 126h52l11 59h-74z" fill="#8e5bc4" />
           <path d="m136 126 14 29 14-29z" fill="#fff" />
@@ -176,7 +176,7 @@ function LoginIllustration({ kind }: { kind: LoginKind }) {
         </g>
       ) : (
         <g>
-          <path d="M126 120h48l13 71h-74z" fill="#3cc67a" />
+          <path d="M126 120h48l13 71h-74z" fill="#4c83c7" />
           <path d="m139 119 11 21 12-21z" fill="#fff" />
           <circle cx="150" cy="88" r="31" fill="#a9694c" />
           <path
@@ -479,7 +479,7 @@ function Login({
             </div>
             <div>
               <dt>Email</dt>
-              <dd>office@greenfield.ac.ke</dd>
+              <dd>office@smartschool.ac.ke</dd>
             </div>
           </dl>
         </Modal>
