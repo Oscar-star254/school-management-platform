@@ -1,4 +1,4 @@
-const CACHE = "greenfield-shell-v1"
+const CACHE = "smartschool-shell-v1"
 const SHELL = ["/", "/manifest.webmanifest", "/favicon.svg"]
 
 self.addEventListener("install", (event) => {

@@ -80,7 +80,7 @@ function seededMarks(index: number) {
 }
 
 const initialState: SchoolState = {
-  schoolName: "Greenfield Academy",
+  schoolName: "Smart Schools Kindergarten",
   motto: "Learn · Grow · Lead",
   learners: initialLearners,
   marks: Object.fromEntries(
@@ -108,7 +108,16 @@ function load(): SchoolState {
   if (API_ENABLED) return serverInitialState
   try {
     const stored = localStorage.getItem(storageKey)
-    return stored ? { ...initialState, ...JSON.parse(stored) } : initialState
+    if (!stored) return initialState
+    const savedState: Partial<SchoolState> = JSON.parse(stored)
+    return {
+      ...initialState,
+      ...savedState,
+      schoolName:
+        savedState.schoolName === "Greenfield Academy"
+          ? initialState.schoolName
+          : (savedState.schoolName ?? initialState.schoolName),
+    }
   } catch {
     return initialState
   }

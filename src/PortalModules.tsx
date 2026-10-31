@@ -61,7 +61,7 @@ function downloadCsv(learners: ReturnType<typeof useSchoolStore>["learners"]) {
   ].join("\n")
   const link = document.createElement("a")
   link.href = URL.createObjectURL(new Blob([body], { type: "text/csv" }))
-  link.download = "greenfield-learners.csv"
+  link.download = "smartschool-learners.csv"
   link.click()
   URL.revokeObjectURL(link.href)
 }

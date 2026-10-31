@@ -1,6 +1,6 @@
 # Privacy and children's data
 
-Greenfield Academy is the data controller. Collect only records needed for education, safeguarding, attendance, communication, and lawful fee administration. Publish a clear parent notice describing purpose, retention, access, correction, and complaint routes under Kenya's Data Protection Act, 2019.
+Smart Schools Kindergarten is the data controller. Collect only records needed for education, safeguarding, attendance, communication, and lawful fee administration. Publish a clear parent notice describing purpose, retention, access, correction, and complaint routes under Kenya's Data Protection Act, 2019.
 
 - Restrict learner records by role and class allocation.
 - Never expose class lists through learner accounts.
