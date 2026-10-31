@@ -133,107 +133,18 @@ const notices = [
   },
 ]
 
-function SchoolBuilding() {
-  return (
-    <g opacity=".62" fill="#d6dde0">
-      <path d="M44 53h212v105H44z" />
-      <path d="m32 55 118-42 118 42H32Z" />
-      <path d="M102 37h96v121h-96z" />
-      <path d="m91 40 59-32 59 32H91Z" />
-      <circle cx="150" cy="38" r="13" fill="#f5f7f8" />
-      <path d="M149 29h3v10l7 4-2 3-8-5z" fill="#b2bdc2" />
-      {[61, 96, 181, 216].map((x) => (
-        <g key={x} fill="#f5f7f8">
-          <rect x={x} y="72" width="22" height="25" rx="2" />
-          <rect x={x} y="111" width="22" height="25" rx="2" />
-        </g>
-      ))}
-      <path d="M131 105h38v53h-38z" fill="#c0c9cd" />
-    </g>
-  )
-}
+const defaultVision =
+  "To nurture confident, curious learners who are ready to shape a brighter future."
 
-function LoginIllustration({ kind }: { kind: LoginKind }) {
-  return (
-    <svg
-      className="login-illustration"
-      viewBox="0 0 300 220"
-      role="img"
-      aria-label={`${kind} login illustration`}
-    >
-      <SchoolBuilding />
-      <ellipse cx="150" cy="207" rx="52" ry="6" fill="#dfe4e6" />
-      {kind === "student" ? (
-        <g>
-          <path
-            d="M113 121c-16 4-23 22-23 45v23h25l5-64zM187 121c16 4 23 22 23 45v23h-25l-5-64z"
-            fill="#4c83c7"
-          />
-          <path d="M124 126h52l11 59h-74z" fill="#8e5bc4" />
-          <path d="m136 126 14 29 14-29z" fill="#fff" />
-          <path d="m147 132 6 1 4 19-7 9-7-9z" fill="#e8a832" />
-          <circle cx="150" cy="94" r="31" fill="#ad6d4f" />
-          <path
-            d="M120 93c0-31 20-43 39-37 17 5 24 21 21 37-10-5-16-14-19-21-11 12-25 17-41 21Z"
-            fill="#26333b"
-          />
-          <circle cx="139" cy="96" r="2.5" fill="#26333b" />
-          <circle cx="162" cy="96" r="2.5" fill="#26333b" />
-          <path
-            d="M142 108c6 5 12 5 18 0"
-            fill="none"
-            stroke="#fff"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <path d="M125 178h20v29h-22zM157 178h20l2 29h-22z" fill="#70459c" />
-          <path d="M119 204h29v7h-29zM155 204h29v7h-29z" fill="#26333b" />
-          <path
-            d="M111 129c-9 17-10 33-4 48M189 129c9 17 10 33 4 48"
-            fill="none"
-            stroke="#8b513e"
-            strokeWidth="8"
-            strokeLinecap="round"
-          />
-          <circle cx="107" cy="178" r="6" fill="#ad6d4f" />
-          <circle cx="193" cy="178" r="6" fill="#ad6d4f" />
-        </g>
-      ) : (
-        <g>
-          <path d="M126 120h48l13 71h-74z" fill="#4c83c7" />
-          <path d="m139 119 11 21 12-21z" fill="#fff" />
-          <circle cx="150" cy="88" r="31" fill="#a9694c" />
-          <path
-            d="M119 91c-3-27 10-42 31-42 27 0 37 22 31 48l-12-5c1-13-2-23-12-29-7 13-21 20-38 21z"
-            fill="#202c33"
-          />
-          <path d="M120 83c-9 27 3 41 13 44V83zM178 80c9 28-3 43-13 47V82z" fill="#202c33" />
-          <circle cx="140" cy="91" r="2.5" fill="#26333b" />
-          <circle cx="160" cy="91" r="2.5" fill="#26333b" />
-          <path
-            d="M142 103c5 4 11 4 16 0"
-            fill="none"
-            stroke="#fff"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <path d="M128 188h18v20h-20zM158 188h18l1 20h-20z" fill="#26333b" />
-          <path d="M122 205h28v7h-28zM154 205h28v7h-28z" fill="#202c33" />
-          <path
-            d="M124 130c-11 16-11 31-4 43M176 128c10 14 15 24 18 37"
-            fill="none"
-            stroke="#9d5d45"
-            strokeWidth="8"
-            strokeLinecap="round"
-          />
-          <path d="M96 159h37v39H96z" fill="#8e5bc4" />
-          <path d="M106 159v-9h17v9" fill="none" stroke="#70459c" strokeWidth="5" />
-          <path d="m163 126 26 9-9 38-27-9z" fill="#fff" />
-          <path d="m168 136 13 4M166 145l13 4M163 154l13 4" stroke="#b8c0c4" strokeWidth="2" />
-        </g>
-      )}
-    </svg>
-  )
+const defaultMission =
+  "To provide a caring, playful learning environment where every child can learn, grow and thrive."
+
+function readLoginStatement(key: string, fallback: string) {
+  try {
+    return localStorage.getItem(key) ?? fallback
+  } catch {
+    return fallback
+  }
 }
 
 function Modal({
@@ -308,18 +219,10 @@ function LoginPanel({
     if (ready) onLogin(username, remember, password)
   }
 
-  const { schoolName } = useSchoolStore()
-
   return (
     <section className={`login-panel ${active ? "active" : "inactive"}`} onMouseDown={onActivate}>
       <div className="login-content">
-        <LoginIllustration kind={kind} />
-        {API_ENABLED && schoolName && (
-          <p className="register-copy">
-            <strong>{schoolName}</strong>
-          </p>
-        )}
-        <h1>{kind === "student" ? "Student Login" : "Teacher Login"}</h1>
+        <h1>{kind === "student" ? "Student Login" : "Teacher & Admin Login"}</h1>
         <p className="register-copy">
           Not registered?{" "}
           <button className="text-link" onClick={() => onModal("contact")}>
@@ -406,6 +309,19 @@ function Login({ onEnter }: { onEnter: (portal: Portal, remember?: boolean) => v
   const school = useSchoolStore()
 
   const [loginError, setLoginError] = useState("")
+  const [vision, setVision] = useState(() => readLoginStatement("smartschool-login-vision", defaultVision))
+  const [mission, setMission] = useState(() =>
+    readLoginStatement("smartschool-login-mission", defaultMission),
+  )
+
+  function updateStatement(key: string, value: string, update: (value: string) => void) {
+    update(value)
+    try {
+      localStorage.setItem(key, value)
+    } catch {
+      // Keep the text editable for this visit when browser storage is unavailable.
+    }
+  }
 
   async function apiSignIn(identifier: string, password: string, remember: boolean) {
     try {
@@ -435,59 +351,143 @@ function Login({ onEnter }: { onEnter: (portal: Portal, remember?: boolean) => v
 
   return (
     <main className="login-page">
-      <div className="mobile-switch" aria-label="Choose login type">
-        <button
-          className={active === "student" ? "selected" : ""}
-          onClick={() => setActive("student")}
-        >
-          Student
-        </button>
-        <button
-          className={active === "teacher" ? "selected" : ""}
-          onClick={() => setActive("teacher")}
-        >
-          Teacher
-        </button>
-      </div>
-      <LoginPanel
-        kind="student"
-        active={active === "student"}
-        onActivate={() => setActive("student")}
-        onLogin={(username, remember, password) => {
-          if (API_ENABLED) return void apiSignIn(username, password, remember)
-
-          const learner = school.learners.find(
-            (item) =>
-              item.admission.toLowerCase() === username.toLowerCase() && item.status === "Active",
-          )
-
-          if (!learner) {
-            setModal("help")
-
-            return
-          }
-
-          setActiveLearner(learner.admission)
-
-          onEnter("student", remember)
-        }}
-        onModal={setModal}
-      />
-      <LoginPanel
-        kind="teacher"
-        active={active === "teacher"}
-        onActivate={() => setActive("teacher")}
-        onLogin={(username, remember, password) =>
-          API_ENABLED
-            ? void apiSignIn(username, password, remember)
-            : onEnter(
-                /admin|head|bursar|secretary/i.test(username) ? "admin" : "teacher",
-
-                remember,
-              )
+      <section
+        className={`login-hero ${school.schoolPhotoUrl ? "has-school-photo" : ""}`}
+        style={
+          school.schoolPhotoUrl
+            ? {
+                backgroundImage: `linear-gradient(180deg, rgba(7, 42, 94, .08) 0%, rgba(7, 34, 79, .84) 76%), url("${school.schoolPhotoUrl}")`,
+              }
+            : undefined
         }
-        onModal={setModal}
-      />
+        aria-label="Smart Schools Kindergarten welcome"
+      >
+        <div className="login-brand">
+          <div className="login-brand-mark">
+            {school.schoolBadgeUrl ? (
+              <img src={school.schoolBadgeUrl} alt="" />
+            ) : (
+              <BookOpen size={25} aria-hidden="true" />
+            )}
+          </div>
+          <div>
+            <strong>{school.schoolName || "Smart Schools Kindergarten"}</strong>
+            <span>EARLY LEARNING · BRIGHT FUTURES</span>
+          </div>
+        </div>
+        <div className="login-hero-copy">
+          <span className="login-eyebrow">WELCOME TO OUR SCHOOL</span>
+          <h1>Big beginnings start here.</h1>
+          <p className="login-motto">Play, Learn and Grow.</p>
+        </div>
+        <div className="login-statements">
+          <label>
+            <span>Our vision</span>
+            <textarea
+              aria-label="Edit school vision"
+              rows={4}
+              value={vision}
+              onChange={(event) =>
+                updateStatement("smartschool-login-vision", event.target.value, setVision)
+              }
+            />
+          </label>
+          <label>
+            <span>Our mission</span>
+            <textarea
+              aria-label="Edit school mission"
+              rows={4}
+              value={mission}
+              onChange={(event) =>
+                updateStatement("smartschool-login-mission", event.target.value, setMission)
+              }
+            />
+          </label>
+          <small>School statements are editable and saved on this device.</small>
+        </div>
+        <span className="login-hero-footer">A happy place to discover, create and belong.</span>
+      </section>
+
+      <section className="login-side" aria-label="Sign in to your school portal">
+        <header className="login-side-heading">
+          <span className="login-eyebrow">SMARTSCHOOL PORTAL</span>
+          <h2>Sign in to continue</h2>
+          <p>Choose your portal and enter your school account details.</p>
+        </header>
+        <div className="login-card">
+          <div className="login-role-switch" role="group" aria-label="Choose login type">
+            <button
+              type="button"
+              aria-pressed={active === "student"}
+              className={active === "student" ? "selected" : ""}
+              onClick={() => setActive("student")}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              aria-pressed={active === "teacher"}
+              className={active === "teacher" ? "selected" : ""}
+              onClick={() => setActive("teacher")}
+            >
+              Teacher / Admin
+            </button>
+          </div>
+          <div className="login-forms">
+            <LoginPanel
+              kind="student"
+              active={active === "student"}
+              onActivate={() => setActive("student")}
+              onLogin={(username, remember, password) => {
+                if (API_ENABLED) return void apiSignIn(username, password, remember)
+
+                const learner = school.learners.find(
+                  (item) =>
+                    item.admission.toLowerCase() === username.toLowerCase() &&
+                    item.status === "Active",
+                )
+
+                if (!learner) {
+                  setModal("help")
+
+                  return
+                }
+
+                setActiveLearner(learner.admission)
+
+                onEnter("student", remember)
+              }}
+              onModal={setModal}
+            />
+            <LoginPanel
+              kind="teacher"
+              active={active === "teacher"}
+              onActivate={() => setActive("teacher")}
+              onLogin={(username, remember, password) =>
+                API_ENABLED
+                  ? void apiSignIn(username, password, remember)
+                  : onEnter(
+                      /admin|head|bursar|secretary/i.test(username) ? "admin" : "teacher",
+                      remember,
+                    )
+              }
+              onModal={setModal}
+            />
+          </div>
+        </div>
+        <div className="login-contact">
+          <span className="login-contact-icon">
+            <Phone size={17} />
+          </span>
+          <span>
+            <strong>Need help signing in?</strong>
+            <small>Our administration team is ready to help.</small>
+          </span>
+          <button type="button" onClick={() => setModal("contact")}>
+            Contact administration
+          </button>
+        </div>
+      </section>
       {modal === "contact" && (
         <Modal title="Contact the school office" onClose={() => setModal(null)}>
           <p>Accounts are created by the school to protect learner information.</p>
