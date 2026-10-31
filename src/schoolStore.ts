@@ -39,6 +39,8 @@ type SchoolState = {
 
   schoolBadgeUrl?: string
 
+  schoolPhotoUrl?: string
+
   learners: Learner[]
 
   marks: Record<string, Record<string, number | null>>
@@ -128,6 +130,8 @@ const initialState: SchoolState = {
   motto: "Learn · Grow · Lead",
 
   schoolBadgeUrl: "",
+
+  schoolPhotoUrl: "",
 
   learners: initialLearners,
 
@@ -336,6 +340,7 @@ export function hydrateSchool(settings: {
   schoolName?: string | null
   motto?: string | null
   schoolBadgeUrl?: string | null
+  schoolPhotoUrl?: string | null
 }) {
   state = {
     ...state,
@@ -345,6 +350,8 @@ export function hydrateSchool(settings: {
     motto: settings.motto ?? "",
 
     schoolBadgeUrl: settings.schoolBadgeUrl ?? state.schoolBadgeUrl,
+
+    schoolPhotoUrl: settings.schoolPhotoUrl ?? state.schoolPhotoUrl,
   }
 
   listeners.forEach((listener) => listener())

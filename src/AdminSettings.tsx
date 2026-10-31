@@ -52,6 +52,8 @@ export function SettingsLive() {
 
     schoolBadgeUrl: "",
 
+    schoolPhotoUrl: "",
+
     reportTemplate: "classic" as "classic" | "modern",
 
     invoiceTemplate: "classic" as "classic" | "modern",
@@ -84,6 +86,8 @@ export function SettingsLive() {
           primaryColor: doc.primaryColor ?? "#3478c8",
 
           schoolBadgeUrl: doc.schoolBadgeUrl ?? "",
+
+          schoolPhotoUrl: doc.schoolPhotoUrl ?? "",
 
           reportTemplate: doc.reportTemplate ?? "classic",
 
@@ -221,6 +225,58 @@ export function SettingsLive() {
                   onClick={() => setForm({ ...form, schoolBadgeUrl: "" })}
                 >
                   Remove badge
+                </button>
+              )}
+            </div>
+          </Field>
+          <Field label="School photo">
+            <div className="badge-upload-control">
+              {form.schoolPhotoUrl && (
+                <img
+                  className="school-photo-preview"
+                  src={form.schoolPhotoUrl}
+                  alt="School photo preview"
+                />
+              )}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                disabled={uploadingBadge}
+                onChange={async (event) => {
+                  const file = event.target.files?.[0]
+
+                  if (!file) return
+
+                  setUploadingBadge(true)
+
+                  try {
+                    const media = await apiUploadMedia(file, `${form.schoolName} school photo`)
+
+                    setForm((current) => ({
+                      ...current,
+                      schoolPhotoUrl: media.url ?? "",
+                    }))
+
+                    setMsg({
+                      ok: "School photo uploaded. Save settings to apply it.",
+                    })
+                  } catch (error) {
+                    setMsg({ err: errorText(error) })
+                  } finally {
+                    setUploadingBadge(false)
+
+                    event.target.value = ""
+                  }
+                }}
+              />
+              {uploadingBadge && <small>Uploading photo…</small>}
+              {form.schoolPhotoUrl && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setForm({ ...form, schoolPhotoUrl: "" })}
+                >
+                  Remove photo
                 </button>
               )}
             </div>

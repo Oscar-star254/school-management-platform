@@ -550,6 +550,18 @@ function AppShell({
   const learner = activeLearner(school)
 
   const [page, setPage] = useState(portal === "student" ? "Home" : "Dashboard")
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("smartschool-admin-nav-groups")
+      const groups: unknown = saved ? JSON.parse(saved) : null
+      return Array.isArray(groups) && groups.every((group) => typeof group === "string")
+        ? groups
+        : ["People", "Academics"]
+    } catch {
+      return ["People", "Academics"]
+    }
+  })
 
   const nav =
     portal === "student"
@@ -572,15 +584,27 @@ function AppShell({
 
             ["Timetable", CalendarDays],
           ] as const)
-        : Object.values(adminNavGroups)
+        : []
 
-            .flat()
+  useEffect(() => {
+    localStorage.setItem("smartschool-admin-nav-groups", JSON.stringify(expandedGroups))
+  }, [expandedGroups])
 
-            .map((label) => [label, label === "Dashboard" ? Home : FileText] as const)
+  const navigate = (nextPage: string) => {
+    setPage(nextPage)
+    setMobileDrawerOpen(false)
+  }
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      {mobileDrawerOpen && (
+        <button
+          className="sidebar-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setMobileDrawerOpen(false)}
+        />
+      )}
+      <aside className={`sidebar ${mobileDrawerOpen ? "mobile-open" : ""}`}>
         <div className="school-brand">
           <div className="crest">
             {school.schoolBadgeUrl ? (
@@ -596,18 +620,77 @@ function AppShell({
         </div>
         <nav aria-label="Main navigation">
           <p>{portal === "admin" ? "SCHOOL ADMINISTRATION" : "PORTAL"}</p>
-          {nav.map(([label, Icon]) => (
-            <button
-              key={label}
-              className={
-                page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
-              }
-              onClick={() => setPage(label)}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </button>
-          ))}
+          {portal === "admin" ? (
+            <>
+              <button
+                className={`sidebar-dashboard-link ${page === "Dashboard" ? "current" : ""}`}
+                onClick={() => navigate("Dashboard")}
+              >
+                <Home size={18} />
+                <span>Dashboard</span>
+              </button>
+              {Object.entries(adminNavGroups)
+                .filter(([group]) => group !== "Overview")
+                .map(([group, pages]) => {
+                  const GroupIcon =
+                    group === "People"
+                      ? UsersRound
+                      : group === "Academics"
+                        ? GraduationCap
+                        : group === "Finance"
+                          ? WalletCards
+                          : group === "Communication"
+                            ? CalendarDays
+                            : ShieldCheck
+                  const expanded = expandedGroups.includes(group)
+                  return (
+                    <section className="sidebar-group" key={group}>
+                      <button
+                        className={`sidebar-group-toggle ${expanded ? "expanded" : ""}`}
+                        aria-expanded={expanded}
+                        onClick={() =>
+                          setExpandedGroups((current) =>
+                            current.includes(group)
+                              ? current.filter((item) => item !== group)
+                              : [...current, group],
+                          )
+                        }
+                      >
+                        <GroupIcon size={17} />
+                        <span>{group}</span>
+                        <ChevronDown size={15} className="sidebar-group-chevron" />
+                      </button>
+                      {expanded && (
+                        <div className="sidebar-group-pages">
+                          {pages.map((label) => (
+                            <button
+                              key={label}
+                              className={page === label ? "current" : ""}
+                              onClick={() => navigate(label)}
+                            >
+                              <span>{label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </section>
+                  )
+                })}
+            </>
+          ) : (
+            nav.map(([label, Icon]) => (
+              <button
+                key={label}
+                className={
+                  page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
+                }
+                onClick={() => setPage(label)}
+              >
+                <Icon size={18} />
+                <span>{label}</span>
+              </button>
+            ))
+          )}
         </nav>
         <div className="sidebar-user">
           {API_ENABLED ? (
@@ -652,15 +735,27 @@ function AppShell({
       </aside>
       <div className="workspace">
         <header className="topbar">
-          <div>
-            <span className="eyebrow">
-              {portal === "student"
-                ? "LEARNER PORTAL"
-                : portal === "teacher"
-                  ? "TEACHER PORTAL"
-                  : "ADMIN PORTAL"}
-            </span>
-            <h1>{page}</h1>
+          <div className="topbar-heading">
+            {portal === "admin" && (
+              <button
+                className="mobile-nav-toggle"
+                aria-label={mobileDrawerOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileDrawerOpen}
+                onClick={() => setMobileDrawerOpen((open) => !open)}
+              >
+                {mobileDrawerOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            )}
+            <div className="topbar-titles">
+              <span className="eyebrow">
+                {portal === "student"
+                  ? "LEARNER PORTAL"
+                  : portal === "teacher"
+                    ? "TEACHER PORTAL"
+                    : "ADMIN PORTAL"}
+              </span>
+              <h1>{page}</h1>
+            </div>
           </div>
           <div className="topbar-actions">
             {API_ENABLED ? (
@@ -690,7 +785,7 @@ function AppShell({
             ) : portal === "teacher" ? (
               <TeacherLive page={page} />
             ) : (
-              <AdminContent page={page} />
+              <AdminContent page={page} onNavigate={navigate} />
             )
           ) : portal === "student" ? (
             <>
@@ -707,23 +802,25 @@ function AppShell({
               )}
             </>
           ) : (
-            <AdminContent page={page} />
+            <AdminContent page={page} onNavigate={navigate} />
           )}
         </main>
-        <nav className="bottom-nav" aria-label="Mobile navigation">
-          {nav.slice(0, 5).map(([label, Icon]) => (
-            <button
-              key={label}
-              className={
-                page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
-              }
-              onClick={() => setPage(label)}
-            >
-              <Icon size={20} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
+        {portal !== "admin" && (
+          <nav className="bottom-nav" aria-label="Mobile navigation">
+            {nav.slice(0, 5).map(([label, Icon]) => (
+              <button
+                key={label}
+                className={
+                  page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
+                }
+                onClick={() => setPage(label)}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </nav>
+        )}
       </div>
     </div>
   )

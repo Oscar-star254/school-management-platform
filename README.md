@@ -38,9 +38,9 @@ Administrators use **People → Learners** to register a learner and create the 
 
 Administrators publish reports by class and term, either for the full class or selected learners; released reports then appear in each learner's family Reports page. Events are managed separately from notices and can include a poster and location. Class teachers can edit their assigned class timetable, while administrators have read-only timetable access.
 
-Administrators can customize school colors and badge, select invoice and report layouts, and set invoice footer details. Bulk invoices include unpaid prior-term balances without counting those carried balances twice in account statements. Teachers can attach assignment resources, and learners can hand in documents or images through their portal.
+Administrators can customize school colors, badge, and dashboard photo, select invoice and report layouts, and set invoice footer details. The live admin dashboard summarizes current learner enrollment, attendance, published results, recent payments, upcoming events, and audit activity from the connected database. Bulk invoices include unpaid prior-term balances without counting those carried balances twice in account statements. Teachers can attach assignment resources, and learners can hand in documents or images through their portal.
 
-For the API-backed deployment, apply the Payload migrations before enabling these workflows. Assignment files are private and accessible only to the relevant learner/family, assigned teaching staff, and academic administrators.
+For the API-backed deployment, apply the Payload migrations before enabling these workflows, including the additive migration that stores the school dashboard photo URL. Assignment files are private and accessible only to the relevant learner/family, assigned teaching staff, and academic administrators.
 
 ## Deployment and providers
 

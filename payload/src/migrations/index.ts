@@ -8,6 +8,8 @@ import * as migration_20261030_014626_finance from './20261030_014626_finance'
 
 import * as migration_20261031_113000_school_platform_features from './20261031_113000_school_platform_features'
 
+import * as migration_20261031_163000_school_photo from './20261031_163000_school_photo'
+
 export const migrations = [
   {
     up: migration_20261021_053901_initial.up,
@@ -47,5 +49,13 @@ export const migrations = [
     down: migration_20261031_113000_school_platform_features.down,
 
     name: '20261031_113000_school_platform_features',
+  },
+
+  {
+    up: migration_20261031_163000_school_photo.up,
+
+    down: migration_20261031_163000_school_photo.down,
+
+    name: '20261031_163000_school_photo',
   },
 ]
