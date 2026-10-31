@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+
 import {
   ArrowDownToLine,
   BookOpen,
@@ -19,8 +20,11 @@ import {
   UserRoundCog,
   UsersRound,
 } from "lucide-react"
+
 import { LearnerStatus, schoolActions, useSchoolStore } from "./schoolStore"
+
 import { API_ENABLED } from "./api"
+
 import {
   AuditLive,
   ComingSoon,
@@ -30,49 +34,76 @@ import {
   StaffLive,
   UsersRolesLive,
 } from "./AdminPeople"
+
 import { LearningAreasLive, TermsClassesLive } from "./AdminAcademics"
+
 import { ResultsMonitorLive } from "./AdminResults"
+
 import { ReportFormsLive } from "./AdminReports"
+
+import { EventsPanel } from "./Events"
+
 import { GuardiansByClass, LearnersPage } from "./AdminFamilies"
+
 import { NoticesManage } from "./Notices"
+
 import { SettingsLive } from "./AdminSettings"
+
 import { TimetableAdmin } from "./Timetable"
+
 import { FeeStructuresLive, InvoicesLive, PaymentsLive, ReconciliationLive } from "./Finance"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
+
   ["English", "Write a descriptive composition", "27 Jun", "Open"],
+
   ["Science & Technology", "Home energy audit", "01 Jul", "Not started"],
 ]
 
 function downloadCsv(learners: ReturnType<typeof useSchoolStore>["learners"]) {
   const body = [
     "Admission number,Name,Class,Status,Guardian,Phone",
+
     ...learners.map((learner) =>
       [
         learner.admission,
+
         learner.name,
+
         learner.grade,
+
         learner.status,
+
         learner.guardian,
+
         learner.phone,
       ].join(","),
     ),
   ].join("\n")
+
   const link = document.createElement("a")
+
   link.href = URL.createObjectURL(new Blob([body], { type: "text/csv" }))
+
   link.download = "smartschool-learners.csv"
+
   link.click()
+
   URL.revokeObjectURL(link.href)
 }
 
 function Header({
   title,
+
   subtitle,
+
   action,
 }: {
   title: string
+
   subtitle: string
+
   action?: React.ReactNode
 }) {
   return (
@@ -88,13 +119,19 @@ function Header({
 
 function BlankModule({
   title,
+
   subtitle,
+
   icon: Icon,
+
   children,
 }: {
   title: string
+
   subtitle: string
+
   icon: typeof BookOpen
+
   children?: React.ReactNode
 }) {
   return (
@@ -112,6 +149,7 @@ function BlankModule({
 
 export function StudentModule({ page }: { page: string }) {
   const [submitted, setSubmitted] = useState(false)
+
   if (page === "More")
     return (
       <>
@@ -149,10 +187,7 @@ export function StudentModule({ page }: { page: string }) {
                 aria-label="Assignment response"
                 placeholder="Add a response for Fractions in daily life"
               />
-              <button
-                className="primary-button"
-                onClick={() => setSubmitted(true)}
-              >
+              <button className="primary-button" onClick={() => setSubmitted(true)}>
                 <Upload size={15} /> {submitted ? "Submitted" : "Submit work"}
               </button>
             </div>
@@ -168,7 +203,9 @@ export function StudentModule({ page }: { page: string }) {
             <div className="compact-list">
               {[
                 "Grade 5 Mathematics revision.pdf",
+
                 "English reading guide.pdf",
+
                 "Term 2 calendar.pdf",
               ].map((file) => (
                 <article key={file}>
@@ -224,6 +261,7 @@ export function StudentModule({ page }: { page: string }) {
         </div>
       </>
     )
+
   return null
 }
 
@@ -231,26 +269,21 @@ export function TeacherModule({ page }: { page: string }) {
   const details: Record<string, [string, string, typeof BookOpen]> = {
     Class: [
       "Class teacher records",
+
       "Complete competencies, values and learner comments.",
+
       UsersRound,
     ],
-    Assignments: [
-      "Assignments",
-      "Create, publish and grade class activities.",
-      FileText,
-    ],
-    Notices: [
-      "Class notices",
-      "Communication sent to Grade 5 East guardians.",
-      Megaphone,
-    ],
-    Timetable: [
-      "Weekly timetable",
-      "Your assigned classes and learning areas.",
-      CalendarDays,
-    ],
+
+    Assignments: ["Assignments", "Create, publish and grade class activities.", FileText],
+
+    Notices: ["Class notices", "Communication sent to Grade 5 East guardians.", Megaphone],
+
+    Timetable: ["Weekly timetable", "Your assigned classes and learning areas.", CalendarDays],
   }
+
   const [title, subtitle, Icon] = details[page] ?? details.Assignments
+
   if (page === "Timetable")
     return (
       <>
@@ -258,38 +291,33 @@ export function TeacherModule({ page }: { page: string }) {
         <div className="content-card timetable">
           <div className="timetable-row timetable-head">
             <strong>Time</strong>
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
-              (day) => (
-                <strong key={day}>{day}</strong>
-              ),
-            )}
+            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => (
+              <strong key={day}>{day}</strong>
+            ))}
           </div>
           {["08:00", "09:20", "11:00", "13:40"].map((time, row) => (
             <div className="timetable-row" key={time}>
               <time>{time}</time>
-              {[
-                "English",
-                "Mathematics",
-                "Science",
-                "Social Studies",
-                "Creative Arts",
-              ].map((subject, col) => (
-                <span key={subject}>
-                  {(row + col) % 3 === 0 ? (
-                    <>
-                      <strong>{subject}</strong>
-                      <small>5 East</small>
-                    </>
-                  ) : (
-                    "—"
-                  )}
-                </span>
-              ))}
+              {["English", "Mathematics", "Science", "Social Studies", "Creative Arts"].map(
+                (subject, col) => (
+                  <span key={subject}>
+                    {(row + col) % 3 === 0 ? (
+                      <>
+                        <strong>{subject}</strong>
+                        <small>5 East</small>
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </span>
+                ),
+              )}
             </div>
           ))}
         </div>
       </>
     )
+
   if (page === "Assignments")
     return (
       <>
@@ -334,6 +362,7 @@ export function TeacherModule({ page }: { page: string }) {
         </div>
       </>
     )
+
   return (
     <BlankModule title={title} subtitle={subtitle} icon={Icon}>
       <div className="module-copy">
@@ -343,8 +372,7 @@ export function TeacherModule({ page }: { page: string }) {
             : "Three notices published this term"}
         </h3>
         <p>
-          Work saved on this device is queued automatically whenever the
-          connection is unavailable.
+          Work saved on this device is queued automatically whenever the connection is unavailable.
         </p>
         <button className="primary-button">
           {page === "Class" ? "Continue class records" : "Create notice"}
@@ -356,24 +384,25 @@ export function TeacherModule({ page }: { page: string }) {
 
 const adminNavGroups = {
   Overview: ["Dashboard"],
+
   People: ["Learners", "Guardians", "Staff"],
-  Academics: [
-    "Terms & classes",
-    "Learning areas",
-    "Results monitor",
-    "Report forms",
-    "Timetable",
-  ],
+
+  Academics: ["Terms & classes", "Learning areas", "Results monitor", "Report forms", "Timetable"],
+
   Finance: ["Fee structures", "Invoices", "Payments", "Reconciliation"],
-  Communication: ["Notices", "SMS log"],
+
+  Communication: ["Events", "Notices", "SMS log"],
+
   System: ["Settings", "Users & roles", "Audit log", "Devices", "Backups"],
 }
 
 export const adminPages = Object.values(adminNavGroups).flat()
+
 export { adminNavGroups }
 
 function AdminTable({ type }: { type: string }) {
   const school = useSchoolStore()
+
   if (type === "Learners")
     return (
       <div className="content-card">
@@ -382,10 +411,7 @@ function AdminTable({ type }: { type: string }) {
             <Search size={15} />
             <input placeholder="Search learners" />
           </div>
-          <button
-            className="secondary-button"
-            onClick={() => downloadCsv(school.learners)}
-          >
+          <button className="secondary-button" onClick={() => downloadCsv(school.learners)}>
             <FileSpreadsheet size={15} /> Export CSV
           </button>
         </div>
@@ -423,9 +449,7 @@ function AdminTable({ type }: { type: string }) {
                       <option>Transferred</option>
                     </select>
                   </td>
-                  <td>
-                    {learner.status === "Active" ? "Login ready" : "Archived"}
-                  </td>
+                  <td>{learner.status === "Active" ? "Login ready" : "Archived"}</td>
                 </tr>
               ))}
             </tbody>
@@ -433,20 +457,27 @@ function AdminTable({ type }: { type: string }) {
         </div>
       </div>
     )
+
   const rows = {
     Payments: [
       ["MPESA-QK72A", "Amani Mwangi", "KES 8,000", "Confirmed"],
+
       ["MPESA-QK71P", "Chebet Koech", "KES 12,500", "Confirmed"],
     ],
+
     "Audit log": [
       ["18 Jun 10:42", "Tracy Wafula", "Updated scores", "Grade 5 East"],
+
       ["18 Jun 10:31", "Jane Njeri", "Released report", "ADM-1042"],
     ],
+
     "Results monitor": [
       ["Grade 5 East", "Mathematics", "29 / 32", "91%"],
+
       ["Grade 5 East", "English", "32 / 32", "100%"],
     ],
   }[type] ?? [["Current configuration", type, "Active", "Up to date"]]
+
   return (
     <div className="content-card">
       <div className="table-wrap">
@@ -463,9 +494,7 @@ function AdminTable({ type }: { type: string }) {
             {rows.map((row) => (
               <tr key={row.join()}>
                 {row.map((cell, index) => (
-                  <td key={cell}>
-                    {index === 1 ? <strong>{cell}</strong> : cell}
-                  </td>
+                  <td key={cell}>{index === 1 ? <strong>{cell}</strong> : cell}</td>
                 ))}
               </tr>
             ))}
@@ -478,33 +507,47 @@ function AdminTable({ type }: { type: string }) {
 
 function LearnerRegistration() {
   const [open, setOpen] = useState(false)
+
   const [message, setMessage] = useState("")
+
   const [form, setForm] = useState({
     admission: "",
+
     name: "",
+
     grade: "Grade 5 East",
+
     guardian: "",
+
     phone: "",
   })
+
   function register(event: React.FormEvent) {
     event.preventDefault()
+
     try {
       schoolActions.addLearner({ ...form, status: "Active" })
-      setMessage(
-        `${form.name} registered. Login account ${form.admission} is ready.`,
-      )
+
+      setMessage(`${form.name} registered. Login account ${form.admission} is ready.`)
+
       setForm({
         admission: "",
+
         name: "",
+
         grade: "Grade 5 East",
+
         guardian: "",
+
         phone: "",
       })
+
       setOpen(false)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Registration failed")
     }
   }
+
   return (
     <>
       <div className="admin-actions">
@@ -527,6 +570,7 @@ function LearnerRegistration() {
               onChange={(event) =>
                 setForm({
                   ...form,
+
                   admission: event.target.value.toUpperCase(),
                 })
               }
@@ -538,25 +582,16 @@ function LearnerRegistration() {
             <input
               required
               value={form.name}
-              onChange={(event) =>
-                setForm({ ...form, name: event.target.value })
-              }
+              onChange={(event) => setForm({ ...form, name: event.target.value })}
             />
           </label>
           <label>
             <span>Class</span>
             <select
               value={form.grade}
-              onChange={(event) =>
-                setForm({ ...form, grade: event.target.value })
-              }
+              onChange={(event) => setForm({ ...form, grade: event.target.value })}
             >
-              {[
-                "Grade 1 East",
-                "Grade 5 East",
-                "Grade 5 West",
-                "Grade 9 East",
-              ].map((grade) => (
+              {["Grade 1 East", "Grade 5 East", "Grade 5 West", "Grade 9 East"].map((grade) => (
                 <option key={grade}>{grade}</option>
               ))}
             </select>
@@ -566,9 +601,7 @@ function LearnerRegistration() {
             <input
               required
               value={form.guardian}
-              onChange={(event) =>
-                setForm({ ...form, guardian: event.target.value })
-              }
+              onChange={(event) => setForm({ ...form, guardian: event.target.value })}
             />
           </label>
           <label>
@@ -577,9 +610,7 @@ function LearnerRegistration() {
               required
               pattern="254[0-9]{9}"
               value={form.phone}
-              onChange={(event) =>
-                setForm({ ...form, phone: event.target.value })
-              }
+              onChange={(event) => setForm({ ...form, phone: event.target.value })}
               placeholder="254700123456"
             />
           </label>
@@ -594,18 +625,25 @@ function LearnerRegistration() {
 
 function SchoolSettings() {
   const school = useSchoolStore()
+
   const [name, setName] = useState(school.schoolName)
+
   const [motto, setMotto] = useState(school.motto)
+
   const [saved, setSaved] = useState(false)
+
   return (
     <form
       className="content-card settings-form"
       onSubmit={(event) => {
         event.preventDefault()
+
         schoolActions.updateSchool({
           schoolName: name.trim(),
+
           motto: motto.trim(),
         })
+
         setSaved(true)
       }}
     >
@@ -620,6 +658,7 @@ function SchoolSettings() {
           value={name}
           onChange={(event) => {
             setName(event.target.value)
+
             setSaved(false)
           }}
         />
@@ -631,6 +670,7 @@ function SchoolSettings() {
           value={motto}
           onChange={(event) => {
             setMotto(event.target.value)
+
             setSaved(false)
           }}
         />
@@ -654,41 +694,62 @@ function SchoolSettings() {
 
 export function AdminContent({ page }: { page: string }) {
   if (!API_ENABLED) return <AdminContentDemo page={page} />
+
   switch (page) {
     case "Dashboard":
       return <DashboardLive />
+
     case "Learners":
       return <LearnersPage />
+
     case "Guardians":
       return <GuardiansByClass />
+
     case "Staff":
       return <StaffLive />
+
     case "Users & roles":
       return <UsersRolesLive />
+
     case "Audit log":
       return <AuditLive />
+
     case "Terms & classes":
       return <TermsClassesLive />
+
     case "Learning areas":
       return <LearningAreasLive />
+
     case "Results monitor":
       return <ResultsMonitorLive />
+
     case "Report forms":
       return <ReportFormsLive />
+
     case "Notices":
       return <NoticesManage />
+
+    case "Events":
+      return <EventsPanel manage />
+
     case "Settings":
       return <SettingsLive />
+
     case "Timetable":
       return <TimetableAdmin />
+
     case "Fee structures":
       return <FeeStructuresLive />
+
     case "Invoices":
       return <InvoicesLive />
+
     case "Payments":
       return <PaymentsLive />
+
     case "Reconciliation":
       return <ReconciliationLive />
+
     default:
       return <ComingSoon page={page} />
   }
@@ -696,35 +757,59 @@ export function AdminContent({ page }: { page: string }) {
 
 function AdminContentDemo({ page }: { page: string }) {
   const school = useSchoolStore()
+
   const title = page === "Dashboard" ? "School overview" : page
+
   const iconMap: Record<string, typeof BookOpen> = {
     Learners: GraduationCap,
+
     Guardians: UsersRound,
+
     Staff: UserRoundCog,
+
     "Terms & classes": CalendarDays,
+
     "Learning areas": BookOpen,
+
     "Results monitor": FileSpreadsheet,
+
     "Report forms": FileText,
+
     "Fee structures": CircleDollarSign,
+
     Invoices: FileText,
+
     Payments: CircleDollarSign,
+
     Notices: Megaphone,
+
     Settings,
+
     "Users & roles": ShieldCheck,
+
     "Audit log": Database,
+
     Devices: Smartphone,
+
     Backups: Database,
   }
+
   const Icon = iconMap[page] ?? Settings
+
   const figures = useMemo(
     () => [
       ["ATTENDANCE TODAY", "94.8%", "612 of 646 learners"],
+
       ["RESULTS COMPLETE", "82%", "Term 2 across all classes"],
+
       ["FEES COLLECTED", "KES 3.8M", "76% of term invoices"],
+
       ["REPORTS READY", "438", "68% of learners"],
     ],
+
     [],
   )
+
   if (page === "Dashboard")
     return (
       <>
@@ -744,6 +829,7 @@ function AdminContentDemo({ page }: { page: string }) {
         </div>
       </>
     )
+
   if (page === "Settings")
     return (
       <>
@@ -754,6 +840,7 @@ function AdminContentDemo({ page }: { page: string }) {
         <SchoolSettings />
       </>
     )
+
   if (page === "Learners")
     return (
       <>
@@ -765,6 +852,7 @@ function AdminContentDemo({ page }: { page: string }) {
         <AdminTable type="Learners" />
       </>
     )
+
   return (
     <>
       <Header
@@ -774,9 +862,7 @@ function AdminContentDemo({ page }: { page: string }) {
           <button
             className="primary-button"
             onClick={() =>
-              window.alert(
-                `${page}: record editor opened for authorised administrators.`,
-              )
+              window.alert(`${page}: record editor opened for authorised administrators.`)
             }
           >
             <Plus size={15} /> Add record
@@ -787,10 +873,7 @@ function AdminContentDemo({ page }: { page: string }) {
         <span className="module-icon">
           <Icon size={18} />
         </span>
-        <p>
-          Changes to sensitive records are versioned and included in the school
-          audit log.
-        </p>
+        <p>Changes to sensitive records are versioned and included in the school audit log.</p>
       </div>
       <AdminTable type={page} />
     </>

@@ -92,6 +92,8 @@ export interface Config {
     invoices: Invoice;
     payments: Payment;
     'fee-adjustments': FeeAdjustment;
+    'report-publications': ReportPublication;
+    'private-files': PrivateFile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -124,6 +126,8 @@ export interface Config {
     invoices: InvoicesSelect<false> | InvoicesSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     'fee-adjustments': FeeAdjustmentsSelect<false> | FeeAdjustmentsSelect<true>;
+    'report-publications': ReportPublicationsSelect<false> | ReportPublicationsSelect<true>;
+    'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -508,6 +512,15 @@ export interface Event {
    */
   class?: (number | null) | Class;
   description?: string | null;
+  /**
+   * Venue or map-friendly location.
+   */
+  location?: string | null;
+  /**
+   * Upload a poster in the school Events page.
+   */
+  posterUrl?: string | null;
+  posterAlt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -541,6 +554,15 @@ export interface Assignment {
   id: number;
   title: string;
   instructions?: string | null;
+  resources?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   class: number | Class;
   subject: number | Subject;
   dueDate: string;
@@ -563,6 +585,15 @@ export interface AssignmentSubmission {
   assignment: number | Assignment;
   student: number | Student;
   text?: string | null;
+  files?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   submittedAt?: string | null;
   late?: boolean | null;
   marks?: number | null;
@@ -602,6 +633,7 @@ export interface Invoice {
   student: number | Student;
   term: number | Term;
   structure?: (number | null) | FeeStructure;
+  carryForward?: number | null;
   lines: {
     description: string;
     /**
@@ -652,6 +684,42 @@ export interface FeeAdjustment {
   createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-publications".
+ */
+export interface ReportPublication {
+  id: number;
+  student: number | Student;
+  class: number | Class;
+  term: number | Term;
+  publishedBy?: (number | null) | User;
+  publishedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "private-files".
+ */
+export interface PrivateFile {
+  id: number;
+  alt: string;
+  assignment: number | Assignment;
+  student?: (number | null) | Student;
+  uploadedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -776,6 +844,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'fee-adjustments';
         value: number | FeeAdjustment;
+      } | null)
+    | ({
+        relationTo: 'report-publications';
+        value: number | ReportPublication;
+      } | null)
+    | ({
+        relationTo: 'private-files';
+        value: number | PrivateFile;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1087,6 +1163,9 @@ export interface EventsSelect<T extends boolean = true> {
   endDate?: T;
   class?: T;
   description?: T;
+  location?: T;
+  posterUrl?: T;
+  posterAlt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1112,6 +1191,7 @@ export interface TimetableSlotsSelect<T extends boolean = true> {
 export interface AssignmentsSelect<T extends boolean = true> {
   title?: T;
   instructions?: T;
+  resources?: T;
   class?: T;
   subject?: T;
   dueDate?: T;
@@ -1130,6 +1210,7 @@ export interface AssignmentSubmissionsSelect<T extends boolean = true> {
   assignment?: T;
   student?: T;
   text?: T;
+  files?: T;
   submittedAt?: T;
   late?: T;
   marks?: T;
@@ -1166,6 +1247,7 @@ export interface InvoicesSelect<T extends boolean = true> {
   student?: T;
   term?: T;
   structure?: T;
+  carryForward?: T;
   lines?:
     | T
     | {
@@ -1210,6 +1292,40 @@ export interface FeeAdjustmentsSelect<T extends boolean = true> {
   createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-publications_select".
+ */
+export interface ReportPublicationsSelect<T extends boolean = true> {
+  student?: T;
+  class?: T;
+  term?: T;
+  publishedBy?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "private-files_select".
+ */
+export interface PrivateFilesSelect<T extends boolean = true> {
+  alt?: T;
+  assignment?: T;
+  student?: T;
+  uploadedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1259,6 +1375,11 @@ export interface SchoolSetting {
   id: number;
   schoolName: string;
   motto?: string | null;
+  primaryColor?: string | null;
+  /**
+   * Upload the badge in the app Settings page.
+   */
+  schoolBadgeUrl?: string | null;
   phone?: string | null;
   email?: string | null;
   address?: string | null;
@@ -1270,6 +1391,12 @@ export interface SchoolSetting {
    * A line printed at the bottom of every report form.
    */
   reportFooter?: string | null;
+  reportTemplate?: ('classic' | 'modern') | null;
+  invoiceTemplate?: ('classic' | 'modern') | null;
+  /**
+   * Payment instructions printed on invoices.
+   */
+  invoiceFooter?: string | null;
   /**
    * A result at or above the minimum percentage earns that level. Highest first.
    */
@@ -1291,11 +1418,16 @@ export interface SchoolSetting {
 export interface SchoolSettingsSelect<T extends boolean = true> {
   schoolName?: T;
   motto?: T;
+  primaryColor?: T;
+  schoolBadgeUrl?: T;
   phone?: T;
   email?: T;
   address?: T;
   principalName?: T;
   reportFooter?: T;
+  reportTemplate?: T;
+  invoiceTemplate?: T;
+  invoiceFooter?: T;
   gradeBands?:
     | T
     | {
