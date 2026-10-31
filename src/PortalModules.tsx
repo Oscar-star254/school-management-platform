@@ -692,12 +692,18 @@ function SchoolSettings() {
   )
 }
 
-export function AdminContent({ page }: { page: string }) {
+export function AdminContent({
+  page,
+  onNavigate,
+}: {
+  page: string
+  onNavigate: (page: string) => void
+}) {
   if (!API_ENABLED) return <AdminContentDemo page={page} />
 
   switch (page) {
     case "Dashboard":
-      return <DashboardLive />
+      return <DashboardLive onNavigate={onNavigate} />
 
     case "Learners":
       return <LearnersPage />

@@ -25,6 +25,8 @@ export type SchoolSettingsDoc = {
 
   schoolBadgeUrl?: string | null
 
+  schoolPhotoUrl?: string | null
+
   reportTemplate?: "classic" | "modern" | null
 
   invoiceTemplate?: "classic" | "modern" | null
@@ -41,6 +43,8 @@ export function applySchoolSettings(settings: SchoolSettingsDoc) {
     schoolName: settings.schoolName,
     motto: settings.motto,
     schoolBadgeUrl: settings.schoolBadgeUrl,
+
+    schoolPhotoUrl: settings.schoolPhotoUrl,
   })
 
   if (settings.schoolName) document.title = `Smartschool | ${settings.schoolName}`

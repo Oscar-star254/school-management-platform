@@ -70,6 +70,12 @@ export const SchoolSettings: GlobalConfig = {
       admin: { description: 'Upload the badge in the app Settings page.' },
     },
 
+    {
+      name: 'schoolPhotoUrl',
+      type: 'text',
+      admin: { description: 'Upload a school photo in the app Settings page.' },
+    },
+
     { name: 'phone', type: 'text' },
 
     { name: 'email', type: 'email' },

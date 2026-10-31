@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
 import type { FormEvent, ReactNode } from "react"
-import { Check, Hammer, Plus } from "lucide-react"
+import { BookOpen, CalendarDays, Check, FileText, Hammer, Plus, WalletCards } from "lucide-react"
 
 import { apiCount, apiCreate, apiFind, apiLearners, apiUpdate } from "./api"
 import { hydrateLearners } from "./schoolStore"
+import { useSchoolStore } from "./schoolStore"
+import { averagePublishedScore, summarizePaymentsForMonth } from "./adminDashboardData"
 
 /* ------------------------------ shared bits ------------------------------ */
 
@@ -732,33 +734,331 @@ export function LearnersLive() {
 
 /* ------------------------------ Dashboard and log ------------------------------ */
 
-export function DashboardLive() {
-  const [counts, setCounts] = useState<Record<string, number>>({})
-  const [error, setError] = useState("")
+export function DashboardLive({ onNavigate }: { onNavigate: (page: string) => void }) {
+  const school = useSchoolStore()
+  const [counts, setCounts] = useState<
+    Record<string, { value?: number; error?: string; loading: boolean }>
+  >({
+    students: { loading: true },
+    staff: { loading: true },
+    classes: { loading: true },
+    guardians: { loading: true },
+  })
+  const today = new Date()
+  const todayKey = new Date(today.getTime() - today.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 10)
+  const monthStart = `${todayKey.slice(0, 7)}-01`
+  const [countRefresh, setCountRefresh] = useState(0)
   useEffect(() => {
-    const names = ["students", "staff", "guardians", "classes"]
-    Promise.all(names.map((name) => apiCount(name).catch(() => 0)))
-      .then((values) => setCounts(Object.fromEntries(names.map((name, i) => [name, values[i]]))))
-      .catch((e) => setError(errorText(e)))
-  }, [])
-  const cards: [string, string, string][] = [
-    ["LEARNERS", "students", "Registered in the system"],
-    ["STAFF", "staff", "Staff profiles"],
-    ["GUARDIANS", "guardians", "Parents and guardians"],
-    ["CLASSES", "classes", "Classes set up"],
-  ]
+    let active = true
+    const names = ["students", "staff", "classes", "guardians"]
+    void Promise.all(
+      names.map(async (name) => {
+        try {
+          return [name, { value: await apiCount(name), loading: false }] as const
+        } catch (error) {
+          return [name, { error: errorText(error), loading: false }] as const
+        }
+      }),
+    ).then((entries) => {
+      if (active) setCounts(Object.fromEntries(entries))
+    })
+    return () => {
+      active = false
+    }
+  }, [countRefresh])
+
+  const students = useRows<{
+    id: number
+    name?: string
+    currentClass?: unknown
+  }>("students", "limit=500&depth=1&sort=-createdAt")
+  const attendance = useRows<{ id: number; status?: string; date?: string }>(
+    "attendance",
+    `limit=1000&depth=0&where[date][equals]=${todayKey}&sort=-createdAt`,
+  )
+  const events = useRows<{
+    id: number
+    title: string
+    type?: string
+    startDate: string
+    location?: string | null
+    posterUrl?: string | null
+  }>("events", `limit=50&depth=0&where[startDate][greater_than_equal]=${todayKey}&sort=startDate`)
+  const activity = useRows<AuditRow>("audit-logs", "limit=6&depth=1&sort=-createdAt")
+  const payments = useRows<{
+    id: number
+    receiptNumber?: string
+    amount: number
+    paidAt: string
+    status?: string
+    student?: unknown
+  }>("payments", "limit=200&depth=1&sort=-paidAt")
+  const marks = useRows<{
+    id: number
+    score?: number | null
+    assessment?: unknown
+  }>("marks", "limit=1000&depth=2&sort=-createdAt")
+
+  const upcomingEvents = events.rows
+    .filter((event) => event.startDate?.slice(0, 10) >= todayKey)
+    .slice(0, 4)
+  const presentToday = attendance.rows.filter(
+    (record) => record.status === "present" || record.status === "late",
+  ).length
+  const classCounts = students.rows.reduce<Record<string, number>>((totals, student) => {
+    const className = nameOf(student.currentClass) || "Not assigned"
+    totals[className] = (totals[className] ?? 0) + 1
+    return totals
+  }, {})
+  const classEntries = Object.entries(classCounts)
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 6)
+  const classMax = Math.max(1, ...classEntries.map(([, count]) => count))
+  const publishedAverage = averagePublishedScore(marks.rows)
+  const monthlyPayments = summarizePaymentsForMonth(payments.rows, monthStart)
+  const formatMoney = (amount: number) =>
+    new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency: "KES",
+      maximumFractionDigits: 0,
+    }).format(amount)
+  const countDetail = (key: string) => {
+    const count = counts[key]
+    return count?.error
+      ? "Unavailable for your account"
+      : count?.loading
+        ? "Loading live records…"
+        : "Live school records"
+  }
+  const eventsError = events.error
+  const photoStyle = school.schoolPhotoUrl
+    ? { backgroundImage: `linear-gradient(90deg, rgba(12, 35, 66, .72), rgba(12, 35, 66, .1)), url("${school.schoolPhotoUrl}")` }
+    : undefined
+
   return (
-    <Page title="School overview" subtitle="Live figures from the school database.">
-      {error && <p style={{ color: "#b3261e" }}>{error}</p>}
-      <section className="admin-metrics">
-        {cards.map(([label, key, detail]) => (
+    <Page
+      title="School overview"
+      subtitle="A live snapshot of activity, learning and operations at your school."
+    >
+      <section className="dashboard-welcome" style={photoStyle}>
+        <div>
+          <span className="dashboard-welcome-kicker">YOUR SCHOOL, AT A GLANCE</span>
+          <h2>Welcome to {school.schoolName || "your school"}</h2>
+          <p>{school.motto || "A clear view of today and the term ahead."}</p>
+        </div>
+        {!school.schoolPhotoUrl && <BookOpen className="dashboard-welcome-mark" size={76} />}
+      </section>
+
+      <section className="admin-metrics" aria-label="Live school statistics">
+        {[
+          ["LEARNERS", "students"],
+          ["STAFF", "staff"],
+          ["CLASSES", "classes"],
+          ["GUARDIANS", "guardians"],
+        ].map(([label, key]) => (
           <article key={key}>
             <span>{label}</span>
-            <strong>{counts[key] ?? "…"}</strong>
-            <small>{detail}</small>
+            <strong>
+              {counts[key]?.loading
+                ? "—"
+                : counts[key]?.error
+                  ? "Unavailable"
+                  : (counts[key]?.value ?? "—")}
+            </strong>
+            <small>{countDetail(key)}</small>
           </article>
         ))}
       </section>
+
+      <div className="dashboard-quick-actions" aria-label="Quick actions">
+        {[
+          { label: "Add learner", page: "Learners", Icon: Plus },
+          { label: "Create invoice", page: "Invoices", Icon: WalletCards },
+          { label: "Publish reports", page: "Report forms", Icon: FileText },
+          { label: "Add event", page: "Events", Icon: CalendarDays },
+        ].map(({ label, page, Icon }) => (
+          <button key={page} className="dashboard-action" onClick={() => onNavigate(page)}>
+            <span className="dashboard-action-icon">
+              <Icon size={16} />
+            </span>
+            <span>{label}</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="dashboard-overview-grid">
+        <section className="dashboard-panel dashboard-analytics">
+          <div className="dashboard-panel-heading">
+            <div>
+              <span className="dashboard-section-label">ACADEMIC SNAPSHOT</span>
+              <h3>Class enrolment</h3>
+            </div>
+            <span className="dashboard-data-tag">From learner records</span>
+          </div>
+          {students.loading ? (
+            <p className="dashboard-state">Loading class enrolment…</p>
+          ) : students.error ? (
+            <p className="dashboard-state dashboard-error">{students.error}</p>
+          ) : classEntries.length ? (
+            <>
+              <div className="dashboard-bars">
+                {classEntries.map(([name, count]) => (
+                  <div className="dashboard-bar-row" key={name}>
+                    <span title={name}>{name}</span>
+                    <div className="dashboard-bar-track">
+                      <i style={{ width: `${(count / classMax) * 100}%` }} />
+                    </div>
+                    <strong>{count}</strong>
+                  </div>
+                ))}
+              </div>
+              {students.rows.length === 500 && (
+                <p className="dashboard-footnote">Showing the 500 most recently updated learner records.</p>
+              )}
+            </>
+          ) : (
+            <p className="dashboard-state">No learner records are available yet.</p>
+          )}
+          <div className="dashboard-academic-summary">
+            <div>
+              <span>Attendance marked today</span>
+              <strong>
+                {attendance.loading
+                  ? "—"
+                  : attendance.error
+                    ? "Unavailable"
+                    : `${presentToday} / ${attendance.rows.length}`}
+              </strong>
+              {attendance.error && <small className="dashboard-error">{attendance.error}</small>}
+            </div>
+            <div>
+              <span>Published assessment average</span>
+              <strong>
+                {marks.loading
+                  ? "—"
+                  : marks.error
+                    ? "Unavailable"
+                    : publishedAverage === null
+                      ? "No published marks"
+                      : `${publishedAverage}%`}
+              </strong>
+              {marks.error && <small className="dashboard-error">{marks.error}</small>}
+            </div>
+          </div>
+        </section>
+
+        <section className="dashboard-panel dashboard-events">
+          <div className="dashboard-panel-heading">
+            <div>
+              <span className="dashboard-section-label">COMING UP</span>
+              <h3>School calendar</h3>
+            </div>
+            <button className="dashboard-text-link" onClick={() => onNavigate("Events")}>
+              View all
+            </button>
+          </div>
+          {events.loading ? (
+            <p className="dashboard-state">Loading school events…</p>
+          ) : eventsError ? (
+            <p className="dashboard-state dashboard-error">{eventsError}</p>
+          ) : upcomingEvents.length ? (
+            <ul className="dashboard-event-list">
+              {upcomingEvents.map((event) => (
+                <li key={event.id}>
+                  <span className="dashboard-date-tile">
+                    <strong>{new Date(event.startDate).toLocaleDateString("en-KE", { day: "2-digit" })}</strong>
+                    <small>{new Date(event.startDate).toLocaleDateString("en-KE", { month: "short" })}</small>
+                  </span>
+                  <span className="dashboard-event-info">
+                    <strong>{event.title}</strong>
+                    <small>{event.location || event.type || "School event"}</small>
+                  </span>
+                  {event.posterUrl && <img src={event.posterUrl} alt="" />}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="dashboard-state">There are no upcoming events on the calendar.</p>
+          )}
+        </section>
+
+        <section className="dashboard-panel dashboard-finance">
+          <div className="dashboard-panel-heading">
+            <div>
+              <span className="dashboard-section-label">FINANCE</span>
+              <h3>Payments this month</h3>
+            </div>
+            <span className="dashboard-panel-icon">$</span>
+          </div>
+          {payments.loading ? (
+            <p className="dashboard-state">Loading finance records…</p>
+          ) : payments.error ? (
+            <p className="dashboard-state dashboard-error">
+              Finance data is unavailable for your account: {payments.error}
+            </p>
+          ) : (
+            <>
+              <strong className="dashboard-finance-total">{formatMoney(monthlyPayments.total)}</strong>
+              <p className="dashboard-finance-caption">
+                {monthlyPayments.count} valid payment{monthlyPayments.count === 1 ? "" : "s"} recorded since {new Date(`${monthStart}T00:00:00`).toLocaleDateString("en-KE", { day: "numeric", month: "short" })}.
+              </p>
+              {payments.rows.length === 200 && (
+                <p className="dashboard-footnote">Based on the latest 200 payment records.</p>
+              )}
+            </>
+          )}
+        </section>
+
+        <section className="dashboard-panel dashboard-activity">
+          <div className="dashboard-panel-heading">
+            <div>
+              <span className="dashboard-section-label">SYSTEM ACTIVITY</span>
+              <h3>Recent changes</h3>
+            </div>
+            <button className="dashboard-text-link" onClick={() => onNavigate("Audit log")}>
+              Audit log
+            </button>
+          </div>
+          {activity.loading ? (
+            <p className="dashboard-state">Loading recent activity…</p>
+          ) : activity.error ? (
+            <p className="dashboard-state dashboard-error">{activity.error}</p>
+          ) : activity.rows.length ? (
+            <ul className="dashboard-activity-list">
+              {activity.rows.map((item) => (
+                <li key={item.id}>
+                  <span className="dashboard-activity-dot" />
+                  <span>
+                    <strong>{item.summary || "School record updated"}</strong>
+                    <small>{nameOf(item.actor) || "System"} · {new Date(item.createdAt).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}</small>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="dashboard-state">No recent changes have been recorded.</p>
+          )}
+        </section>
+      </div>
+      <button
+        className="dashboard-refresh"
+        onClick={() => {
+          setCountRefresh((value) => value + 1)
+          void Promise.all([
+            students.reload(),
+            attendance.reload(),
+            events.reload(),
+            activity.reload(),
+            payments.reload(),
+            marks.reload(),
+          ])
+        }}
+      >
+        Refresh live statistics
+      </button>
     </Page>
   )
 }
