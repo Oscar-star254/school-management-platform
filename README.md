@@ -34,6 +34,14 @@ Teacher marks are persisted by admission number and learning area. Changing a ma
 
 Administrators use **People → Learners** to register a learner and create the portal identity. The status control moves a learner between Active, Completed, and Transferred; only Active learners can log in or appear in current teacher entry lists. **System → Settings** updates the school name and motto across all portal shells.
 
+## Academic, finance, and family workflows
+
+Administrators publish reports by class and term, either for the full class or selected learners; released reports then appear in each learner's family Reports page. Events are managed separately from notices and can include a poster and location. Class teachers can edit their assigned class timetable, while administrators have read-only timetable access.
+
+Administrators can customize school colors and badge, select invoice and report layouts, and set invoice footer details. Bulk invoices include unpaid prior-term balances without counting those carried balances twice in account statements. Teachers can attach assignment resources, and learners can hand in documents or images through their portal.
+
+For the API-backed deployment, apply the Payload migrations before enabling these workflows. Assignment files are private and accessible only to the relevant learner/family, assigned teaching staff, and academic administrators.
+
 ## Deployment and providers
 
 Copy `.env.example` to `.env`. `MPESA_MODE=MOCK` and `SMS_MODE=MOCK` are safe defaults. To connect live providers, set their modes and provide credentials only through deployment secrets. See `docs/deployment.md`, `docs/privacy.md`, and the three role guides.

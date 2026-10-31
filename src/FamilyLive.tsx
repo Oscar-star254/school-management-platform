@@ -1,8 +1,11 @@
 import { useState } from "react"
 
-import { ComingSoon, Empty, Note, Page, errorText, nameOf } from "./AdminPeople"
+import { ComingSoon, Empty, Note, Page, errorText, nameOf, relId } from "./AdminPeople"
+
 import type { Msg } from "./AdminPeople"
+
 import { Table, useFind } from "./LiveShell"
+
 import {
   attendanceQuery,
   attendanceSummary,
@@ -14,25 +17,42 @@ import {
   resultsForTerm,
   termsOf,
 } from "./resultsData"
+
 import type { AttendanceDoc, MarkDoc, TermInfo } from "./resultsData"
+
 import { useSchoolStore } from "./schoolStore"
+
 import { NoticesInbox } from "./Notices"
+
 import { FamilyMore } from "./FamilyMore"
+
 import { FamilyFees } from "./Finance"
 
-type Child = { id: number; name?: string; admissionNumber?: string; status?: string; currentClass?: unknown }
+import { EventsPanel } from "./Events"
+
+type Child = {
+  id: number
+  name?: string
+  admissionNumber?: string
+  status?: string
+  currentClass?: unknown
+}
 
 const heading = { margin: "22px 0 10px", fontSize: 15 } as const
 
 function useChildMarks(child: Child) {
   const marks = useFind<MarkDoc>("marks", `limit=1000&depth=2&where[student][equals]=${child.id}`)
+
   const published = publishedMarks(marks.rows)
+
   return { ...marks, published, terms: termsOf(published) }
 }
 
 function ResultsTable({ marks, term }: { marks: MarkDoc[]; term: TermInfo }) {
   const rows = resultsForTerm(marks, term.id)
+
   const average = overallPercent(rows)
+
   return (
     <div className="content-card">
       <Table heads={["Learning area", "Result", "Level", "Comment"]}>
@@ -65,19 +85,45 @@ function ResultsTable({ marks, term }: { marks: MarkDoc[]; term: TermInfo }) {
 
 function FamilyHome({ child }: { child: Child }) {
   const marks = useChildMarks(child)
+
   const current = useFind<TermInfo>("terms", "limit=1&depth=0&where[isCurrent][equals]=true")
+
   const term = current.rows[0]
-  const attendance = useFind<AttendanceDoc>("attendance", current.loading ? null : attendanceQuery(child.id, term))
+
+  const attendance = useFind<AttendanceDoc>(
+    "attendance",
+    current.loading ? null : attendanceQuery(child.id, term),
+  )
+
   const summary = attendanceSummary(attendance.rows)
+
   const latest = marks.terms[0]
+
   const average = latest ? overallPercent(resultsForTerm(marks.published, latest.id)) : null
+
   const cards: [string, string, string][] = [
-    ["ATTENDANCE", summary.percent === null ? "—" : `${summary.percent}%`, summary.total ? `${summary.attended} of ${summary.total} recorded days${term ? ` in ${term.name}` : ""}` : "Nothing recorded yet"],
-    ["LATEST AVERAGE", average === null ? "—" : `${average}%`, latest ? `${latest.name} (${levelFor(average)})` : "No published results yet"],
+    [
+      "ATTENDANCE",
+      summary.percent === null ? "—" : `${summary.percent}%`,
+      summary.total
+        ? `${summary.attended} of ${summary.total} recorded days${term ? ` in ${term.name}` : ""}`
+        : "Nothing recorded yet",
+    ],
+
+    [
+      "LATEST AVERAGE",
+      average === null ? "—" : `${average}%`,
+      latest ? `${latest.name} (${levelFor(average)})` : "No published results yet",
+    ],
+
     ["CLASS", nameOf(child.currentClass) || "—", `Admission ${child.admissionNumber ?? ""}`],
   ]
+
   return (
-    <Page title={child.name ?? "Learner"} subtitle="A summary of attendance and the latest published results.">
+    <Page
+      title={child.name ?? "Learner"}
+      subtitle="A summary of attendance and the latest published results."
+    >
       <section className="admin-metrics">
         {cards.map(([label, value, detail]) => (
           <article key={label}>
@@ -92,7 +138,12 @@ function FamilyHome({ child }: { child: Child }) {
         <ResultsTable marks={marks.published} term={latest} />
       ) : (
         <div className="content-card">
-          <Empty loading={marks.loading} error={marks.error} count={0} text="No results have been published yet. They will appear here as soon as the school releases them." />
+          <Empty
+            loading={marks.loading}
+            error={marks.error}
+            count={0}
+            text="No results have been published yet. They will appear here as soon as the school releases them."
+          />
         </div>
       )}
     </Page>
@@ -101,13 +152,20 @@ function FamilyHome({ child }: { child: Child }) {
 
 function FamilyResults({ child }: { child: Child }) {
   const marks = useChildMarks(child)
+
   const [picked, setPicked] = useState("")
+
   const term = marks.terms.find((item) => String(item.id) === picked) ?? marks.terms[0]
+
   return (
     <Page title="Results" subtitle={`Published results for ${child.name}.`}>
       <div className="admin-actions">
         {marks.terms.length > 0 && (
-          <select className="table-select" value={term?.id ?? ""} onChange={(e) => setPicked(e.target.value)}>
+          <select
+            className="table-select"
+            value={term?.id ?? ""}
+            onChange={(e) => setPicked(e.target.value)}
+          >
             {marks.terms.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -120,7 +178,12 @@ function FamilyResults({ child }: { child: Child }) {
         <ResultsTable marks={marks.published} term={term} />
       ) : (
         <div className="content-card">
-          <Empty loading={marks.loading} error={marks.error} count={0} text="No results have been published yet." />
+          <Empty
+            loading={marks.loading}
+            error={marks.error}
+            count={0}
+            text="No results have been published yet."
+          />
         </div>
       )}
     </Page>
@@ -129,25 +192,46 @@ function FamilyResults({ child }: { child: Child }) {
 
 function FamilyReports({ child }: { child: Child }) {
   const { schoolName } = useSchoolStore()
+
   const marks = useChildMarks(child)
+
+  const releases = useFind<{ id: number; term?: unknown; publishedAt?: string }>(
+    "report-publications",
+
+    `limit=100&depth=1&where[student][equals]=${child.id}&sort=-publishedAt`,
+  )
+
   const [msg, setMsg] = useState<Msg>({})
+
   const [busy, setBusy] = useState<number | null>(null)
 
   async function download(term: TermInfo) {
     setBusy(term.id)
+
     try {
       const attendance = attendanceSummary(await fetchAttendance(child.id, term))
+
       await downloadLiveReport({
         schoolName,
-        learner: { name: child.name ?? "Learner", admission: child.admissionNumber ?? "", className: nameOf(child.currentClass) },
+
+        learner: {
+          name: child.name ?? "Learner",
+          admission: child.admissionNumber ?? "",
+          className: nameOf(child.currentClass),
+        },
+
         termName: term.name,
+
         rows: resultsForTerm(marks.published, term.id),
+
         attendance,
       })
+
       setMsg({ ok: `${term.name} report downloaded.` })
     } catch (e) {
       setMsg({ err: errorText(e) })
     }
+
     setBusy(null)
   }
 
@@ -157,21 +241,47 @@ function FamilyReports({ child }: { child: Child }) {
         <Note ok={msg.ok} error={msg.err} />
       </div>
       <div className="content-card">
-        <Empty loading={marks.loading} error={marks.error} count={marks.terms.length} text="No report is available yet. Reports appear once the school publishes results." />
-        {marks.terms.length > 0 && (
+        <Empty
+          loading={marks.loading || releases.loading}
+          error={marks.error || releases.error}
+          count={releases.rows.length}
+          text="No report is available yet. Reports appear here after the school publishes them."
+        />
+        {releases.rows.length > 0 && (
           <Table heads={["Term", "Report form"]}>
-            {marks.terms.map((term) => (
-              <tr key={term.id}>
-                <td>
-                  <strong>{term.name}</strong>
-                </td>
-                <td>
-                  <button className="primary-button" disabled={busy === term.id} onClick={() => void download(term)}>
-                    {busy === term.id ? "Preparing…" : "Download PDF"}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {releases.rows.map((release) => {
+              const termId = relId(release.term)
+
+              const term = marks.terms.find((item) => item.id === termId)
+
+              const releasedTerm: TermInfo = term ?? {
+                id: termId ?? release.id,
+
+                name: nameOf(release.term) || "Published report",
+              }
+
+              return (
+                <tr key={release.id}>
+                  <td>
+                    <strong>{releasedTerm.name}</strong>
+                    <small className="release-date">
+                      {release.publishedAt
+                        ? `Published ${new Date(release.publishedAt).toLocaleDateString("en-KE")}`
+                        : ""}
+                    </small>
+                  </td>
+                  <td>
+                    <button
+                      className="primary-button"
+                      disabled={busy === releasedTerm.id || !term}
+                      onClick={() => void download(releasedTerm)}
+                    >
+                      {busy === releasedTerm.id ? "Preparing…" : "Download PDF"}
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
           </Table>
         )}
       </div>
@@ -180,27 +290,35 @@ function FamilyReports({ child }: { child: Child }) {
 }
 
 /** The learner and parent portal. Students see themselves; parents see each linked child. */
+
 export function FamilyLive({ page }: { page: string }) {
   const kids = useFind<Child>("students", "limit=50&depth=1&sort=name")
+
   const [picked, setPicked] = useState("")
+
   const child = kids.rows.find((kid) => String(kid.id) === picked) ?? kids.rows[0]
 
   if (kids.loading) return <p style={{ padding: 16 }}>Loading…</p>
+
   if (!child) {
     return (
       <Page title={page} subtitle="">
         <div className="content-card">
-          <p style={{ padding: 16 }}>No learner is linked to this account yet. Please contact the school office.</p>
+          <p style={{ padding: 16 }}>
+            No learner is linked to this account yet. Please contact the school office.
+          </p>
         </div>
       </Page>
     )
   }
 
   let content
+
   if (page === "Home") content = <FamilyHome key={child.id} child={child} />
   else if (page === "Results") content = <FamilyResults key={child.id} child={child} />
   else if (page === "Reports") content = <FamilyReports key={child.id} child={child} />
   else if (page === "Notices") content = <NoticesInbox key={child.id} />
+  else if (page === "Events") content = <EventsPanel key={child.id} />
   else if (page === "More") content = <FamilyMore key={child.id} child={child} />
   else if (page === "Fees") content = <FamilyFees key={child.id} child={child} />
   else content = <ComingSoon page={page} />
@@ -209,7 +327,11 @@ export function FamilyLive({ page }: { page: string }) {
     <>
       {kids.rows.length > 1 && (
         <div className="admin-actions">
-          <select className="table-select" value={child.id} onChange={(e) => setPicked(e.target.value)}>
+          <select
+            className="table-select"
+            value={child.id}
+            onChange={(e) => setPicked(e.target.value)}
+          >
             {kids.rows.map((kid) => (
               <option key={kid.id} value={kid.id}>
                 {kid.name}

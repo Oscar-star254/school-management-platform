@@ -1,4 +1,5 @@
 import { FormEvent, ReactNode, useEffect, useState } from "react"
+
 import {
   ArrowDownToLine,
   Bell,
@@ -25,12 +26,9 @@ import {
   Wifi,
   X,
 } from "lucide-react"
-import {
-  AdminContent,
-  StudentModule,
-  TeacherModule,
-  adminNavGroups,
-} from "./PortalModules"
+
+import { AdminContent, StudentModule, TeacherModule, adminNavGroups } from "./PortalModules"
+
 import {
   SUBJECTS,
   activeLearner,
@@ -41,52 +39,70 @@ import {
   useSchoolStore,
 } from "./schoolStore"
 
-import {
-  API_ENABLED,
-  apiLearners,
-  apiLogin,
-  apiLogout,
-  apiMe,
-  portalForRole,
-} from "./api"
+import { API_ENABLED, apiLearners, apiLogin, apiLogout, apiMe, portalForRole } from "./api"
+
 import { hydrateLearners } from "./schoolStore"
+
 import { FamilyLive } from "./FamilyLive"
+
 import { TeacherLive } from "./TeacherLive"
+
 import { LiveTermBadge, LiveUserBadge } from "./LiveShell"
+
 import { loadSchoolSettings } from "./settingsData"
 
 type LoginKind = "student" | "teacher"
+
 type Portal = "login" | "student" | "teacher" | "admin"
 
 const results = [
   {
     area: "English",
+
     score: 78,
+
     level: "EE",
+
     remark: "Consistently applies language skills",
   },
+
   {
     area: "Kiswahili",
+
     score: 68,
+
     level: "ME",
+
     remark: "Communicates ideas clearly",
   },
+
   {
     area: "Mathematics",
+
     score: 84,
+
     level: "EE",
+
     remark: "Solves problems confidently",
   },
+
   {
     area: "Science & Technology",
+
     score: 72,
+
     level: "ME",
+
     remark: "Shows sound practical understanding",
   },
+
   {
     area: "Social Studies",
+
     score: 64,
+
     level: "ME",
+
     remark: "Demonstrates good subject knowledge",
   },
 ]
@@ -94,17 +110,25 @@ const results = [
 const notices = [
   {
     date: "18 Jun",
+
     title: "Term 2 parents meeting",
+
     body: "The meeting will be held on Friday, 28 June at 2:00 pm.",
   },
+
   {
     date: "14 Jun",
+
     title: "Grade 5 educational visit",
+
     body: "Consent forms should be returned to the class teacher by Monday.",
   },
+
   {
     date: "10 Jun",
+
     title: "Mid-term break",
+
     body: "Learners break on 20 June and resume on 24 June.",
   },
 ]
@@ -183,10 +207,7 @@ function LoginIllustration({ kind }: { kind: LoginKind }) {
             d="M119 91c-3-27 10-42 31-42 27 0 37 22 31 48l-12-5c1-13-2-23-12-29-7 13-21 20-38 21z"
             fill="#202c33"
           />
-          <path
-            d="M120 83c-9 27 3 41 13 44V83zM178 80c9 28-3 43-13 47V82z"
-            fill="#202c33"
-          />
+          <path d="M120 83c-9 27 3 41 13 44V83zM178 80c9 28-3 43-13 47V82z" fill="#202c33" />
           <circle cx="140" cy="91" r="2.5" fill="#26333b" />
           <circle cx="160" cy="91" r="2.5" fill="#26333b" />
           <path
@@ -206,18 +227,9 @@ function LoginIllustration({ kind }: { kind: LoginKind }) {
             strokeLinecap="round"
           />
           <path d="M96 159h37v39H96z" fill="#8e5bc4" />
-          <path
-            d="M106 159v-9h17v9"
-            fill="none"
-            stroke="#70459c"
-            strokeWidth="5"
-          />
+          <path d="M106 159v-9h17v9" fill="none" stroke="#70459c" strokeWidth="5" />
           <path d="m163 126 26 9-9 38-27-9z" fill="#fff" />
-          <path
-            d="m168 136 13 4M166 145l13 4M163 154l13 4"
-            stroke="#b8c0c4"
-            strokeWidth="2"
-          />
+          <path d="m168 136 13 4M166 145l13 4M163 154l13 4" stroke="#b8c0c4" strokeWidth="2" />
         </g>
       )}
     </svg>
@@ -226,11 +238,15 @@ function LoginIllustration({ kind }: { kind: LoginKind }) {
 
 function Modal({
   title,
+
   children,
+
   onClose,
 }: {
   title: string
+
   children: ReactNode
+
   onClose: () => void
 }) {
   return (
@@ -242,11 +258,7 @@ function Modal({
         aria-labelledby="modal-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <button
-          className="icon-button modal-close"
-          onClick={onClose}
-          aria-label="Close"
-        >
+        <button className="icon-button modal-close" onClick={onClose} aria-label="Close">
           <X size={18} />
         </button>
         <div className="modal-icon">
@@ -261,34 +273,45 @@ function Modal({
 
 function LoginPanel({
   kind,
+
   active,
+
   onActivate,
+
   onLogin,
+
   onModal,
 }: {
   kind: LoginKind
+
   active: boolean
+
   onActivate: () => void
+
   onLogin: (username: string, remember: boolean, password: string) => void
+
   onModal: (modal: "contact" | "help") => void
 }) {
   const [username, setUsername] = useState("")
+
   const [password, setPassword] = useState("")
+
   const [showPassword, setShowPassword] = useState(false)
+
   const [remember, setRemember] = useState(false)
+
   const ready = username.trim().length > 2 && password.length > 3
 
   function submit(event: FormEvent) {
     event.preventDefault()
+
     if (ready) onLogin(username, remember, password)
   }
 
   const { schoolName } = useSchoolStore()
+
   return (
-    <section
-      className={`login-panel ${active ? "active" : "inactive"}`}
-      onMouseDown={onActivate}
-    >
+    <section className={`login-panel ${active ? "active" : "inactive"}`} onMouseDown={onActivate}>
       <div className="login-content">
         <LoginIllustration kind={kind} />
         {API_ENABLED && schoolName && (
@@ -318,9 +341,7 @@ function LoginPanel({
                 onFocus={onActivate}
               />
             </div>
-            {kind === "student" && (
-              <small>Learners and parents: use the admission number</small>
-            )}
+            {kind === "student" && <small>Learners and parents: use the admission number</small>}
           </label>
           <label className="line-field">
             <span>Password</span>
@@ -353,30 +374,18 @@ function LoginPanel({
               />
               <span>Remember me</span>
             </label>
-            <button
-              type="button"
-              className="muted-link"
-              onClick={() => onModal("help")}
-            >
+            <button type="button" className="muted-link" onClick={() => onModal("help")}>
               Forgot Password?
             </button>
           </div>
-          <button
-            type="submit"
-            className="login-button"
-            disabled={!active || !ready}
-          >
+          <button type="submit" className="login-button" disabled={!active || !ready}>
             Login {ready && active ? <Check size={14} /> : null}
           </button>
           <div className="or">
             <span>or</span>
           </div>
           <div className="login-actions">
-            <button
-              type="button"
-              className="help-pill"
-              onClick={() => onModal("help")}
-            >
+            <button type="button" className="help-pill" onClick={() => onModal("help")}>
               <CircleHelp size={18} /> Login help
             </button>
             <a className="contact-pill" href="tel:+254700123456">
@@ -389,32 +398,41 @@ function LoginPanel({
   )
 }
 
-function Login({
-  onEnter,
-}: {
-  onEnter: (portal: Portal, remember?: boolean) => void
-}) {
+function Login({ onEnter }: { onEnter: (portal: Portal, remember?: boolean) => void }) {
   const [active, setActive] = useState<LoginKind>("student")
+
   const [modal, setModal] = useState<"contact" | "help" | null>(null)
+
   const school = useSchoolStore()
+
   const [loginError, setLoginError] = useState("")
+
   async function apiSignIn(identifier: string, password: string, remember: boolean) {
     try {
       const user = await apiLogin(identifier.trim(), password)
+
       const next = portalForRole(user.role)
+
       if (!next) throw new Error("This account cannot use the school portal.")
+
       const learners = await apiLearners()
+
       hydrateLearners(learners)
+
       if (next === "student") {
         const first = learners.find((item) => item.status === "Active")
+
         if (first) setActiveLearner(first.admission)
       }
+
       onEnter(next, remember)
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : "Sign in failed")
+
       setModal("help")
     }
   }
+
   return (
     <main className="login-page">
       <div className="mobile-switch" aria-label="Choose login type">
@@ -437,16 +455,20 @@ function Login({
         onActivate={() => setActive("student")}
         onLogin={(username, remember, password) => {
           if (API_ENABLED) return void apiSignIn(username, password, remember)
+
           const learner = school.learners.find(
             (item) =>
-              item.admission.toLowerCase() === username.toLowerCase() &&
-              item.status === "Active",
+              item.admission.toLowerCase() === username.toLowerCase() && item.status === "Active",
           )
+
           if (!learner) {
             setModal("help")
+
             return
           }
+
           setActiveLearner(learner.admission)
+
           onEnter("student", remember)
         }}
         onModal={setModal}
@@ -459,9 +481,8 @@ function Login({
           API_ENABLED
             ? void apiSignIn(username, password, remember)
             : onEnter(
-                /admin|head|bursar|secretary/i.test(username)
-                  ? "admin"
-                  : "teacher",
+                /admin|head|bursar|secretary/i.test(username) ? "admin" : "teacher",
+
                 remember,
               )
         }
@@ -469,9 +490,7 @@ function Login({
       />
       {modal === "contact" && (
         <Modal title="Contact the school office" onClose={() => setModal(null)}>
-          <p>
-            Accounts are created by the school to protect learner information.
-          </p>
+          <p>Accounts are created by the school to protect learner information.</p>
           <dl>
             <div>
               <dt>Telephone</dt>
@@ -488,12 +507,12 @@ function Login({
         <Modal title="Login help" onClose={() => setModal(null)}>
           {loginError && <p className="modal-note">{loginError}</p>}
           <p>
-            Learners and parents sign in with the learner admission number.
-            Staff use their school username.
+            Learners and parents sign in with the learner admission number. Staff use their school
+            username.
           </p>
           <p className="modal-note">
-            For a password reset, contact the school office. A verification code
-            will be sent to the phone number on record.
+            For a password reset, contact the school office. A verification code will be sent to the
+            phone number on record.
           </p>
         </Modal>
       )}
@@ -503,49 +522,72 @@ function Login({
 
 const parentNav = [
   ["Home", Home],
+
   ["Results", GraduationCap],
+
   ["Reports", FileText],
+
+  ["Events", CalendarDays],
+
   ["Notices", Bell],
+
   ["Fees", WalletCards],
+
   ["More", Menu],
 ] as const
 
 function AppShell({
   portal,
+
   onLogout,
 }: {
   portal: "student" | "teacher" | "admin"
+
   onLogout: () => void
 }) {
   const school = useSchoolStore()
+
   const learner = activeLearner(school)
+
   const [page, setPage] = useState(portal === "student" ? "Home" : "Dashboard")
+
   const nav =
     portal === "student"
       ? parentNav
       : portal === "teacher"
-        ? [
+        ? ([
             ["Dashboard", Home],
+
             ["Attendance", UsersRound],
+
             ["Results", GraduationCap],
+
             ["Class", BookOpen],
+
             ["Assignments", FileText],
+
+            ["Events", CalendarDays],
+
             ["Notices", Bell],
+
             ["Timetable", CalendarDays],
-          ] as const
+          ] as const)
         : Object.values(adminNavGroups)
+
             .flat()
-            .map(
-              (label) =>
-                [label, label === "Dashboard" ? Home : FileText] as const,
-            )
+
+            .map((label) => [label, label === "Dashboard" ? Home : FileText] as const)
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="school-brand">
           <div className="crest">
-            <BookOpen size={23} />
+            {school.schoolBadgeUrl ? (
+              <img src={school.schoolBadgeUrl} alt={`${school.schoolName} badge`} />
+            ) : (
+              <BookOpen size={23} />
+            )}
           </div>
           <div>
             <strong>{school.schoolName}</strong>
@@ -558,9 +600,7 @@ function AppShell({
             <button
               key={label}
               className={
-                page === label || (page === "Home" && label === "Dashboard")
-                  ? "current"
-                  : ""
+                page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
               }
               onClick={() => setPage(label)}
             >
@@ -574,32 +614,35 @@ function AppShell({
             <LiveUserBadge />
           ) : (
             <>
-          <div className="avatar">
-            {portal === "student"
-              ? (learner?.name
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("") ?? "L")
-              : portal === "teacher"
-                ? "TW"
-                : "JN"}
-          </div>
-          <div>
-            <strong>
-              {portal === "student"
-                ? (learner?.name ?? "Learner")
-                : portal === "teacher"
-                  ? "Tracy Wafula"
-                  : "Jane Njeri"}
-            </strong>
-            <span>
-              {portal === "student"
-                ? (learner?.grade ?? "No active class")
-                : portal === "teacher"
-                  ? "Class teacher · 5 East"
-                  : "Super administrator"}
-            </span>
-          </div>
+              <div className="avatar">
+                {portal === "student"
+                  ? (learner?.name
+
+                      .split(" ")
+
+                      .map((part) => part[0])
+
+                      .join("") ?? "L")
+                  : portal === "teacher"
+                    ? "TW"
+                    : "JN"}
+              </div>
+              <div>
+                <strong>
+                  {portal === "student"
+                    ? (learner?.name ?? "Learner")
+                    : portal === "teacher"
+                      ? "Tracy Wafula"
+                      : "Jane Njeri"}
+                </strong>
+                <span>
+                  {portal === "student"
+                    ? (learner?.grade ?? "No active class")
+                    : portal === "teacher"
+                      ? "Class teacher · 5 East"
+                      : "Super administrator"}
+                </span>
+              </div>
             </>
           )}
           <button onClick={onLogout} aria-label="Log out">
@@ -634,10 +677,7 @@ function AppShell({
                 <small>Synced 10:42</small>
               </span>
             </div>
-            <button
-              className="icon-button notification"
-              aria-label="Notifications"
-            >
+            <button className="icon-button notification" aria-label="Notifications">
               <Bell size={19} />
               <i />
             </button>
@@ -675,9 +715,7 @@ function AppShell({
             <button
               key={label}
               className={
-                page === label || (page === "Home" && label === "Dashboard")
-                  ? "current"
-                  : ""
+                page === label || (page === "Home" && label === "Dashboard") ? "current" : ""
               }
               onClick={() => setPage(label)}
             >
@@ -693,13 +731,19 @@ function AppShell({
 
 function Metric({
   label,
+
   value,
+
   detail,
+
   tone,
 }: {
   label: string
+
   value: string
+
   detail: string
+
   tone?: string
 }) {
   return (
@@ -715,11 +759,15 @@ function Metric({
 
 function ResultTable({ full = false }: { full?: boolean }) {
   const school = useSchoolStore()
+
   const learner = activeLearner(school)
+
   const rows = learnerResults(school, learner?.admission ?? "").slice(
     0,
+
     full ? undefined : 5,
   )
+
   return (
     <div className="table-wrap">
       <table>
@@ -742,9 +790,7 @@ function ResultTable({ full = false }: { full?: boolean }) {
                 {row.score === null ? "—" : `${Math.max(0, row.score - 3)}%`}
               </td>
               <td className="number">
-                <strong>
-                  {row.score === null ? "Pending" : `${row.score}%`}
-                </strong>
+                <strong>{row.score === null ? "Pending" : `${row.score}%`}</strong>
               </td>
               <td>
                 <span
@@ -766,71 +812,113 @@ function ResultTable({ full = false }: { full?: boolean }) {
 
 async function downloadReport(
   term: string,
+
   schoolName: string,
+
   reportRows: {
     area: string
+
     score: number | null
+
     level: string
+
     remark: string
   }[] = results,
+
   learner = {
     name: "Amani Mwangi",
+
     admission: "ADM-1042",
+
     grade: "Grade 5 East",
   },
 ) {
   const { jsPDF } = await import("jspdf")
+
   const doc = new jsPDF()
+
   doc.setFont("helvetica", "bold")
+
   doc.setFontSize(18)
+
   doc.text(schoolName.toUpperCase(), 105, 20, { align: "center" })
+
   doc.setFontSize(14)
+
   doc.text("Learner Progress Report", 105, 30, { align: "center" })
+
   doc.setFont("helvetica", "normal")
+
   doc.setFontSize(10)
+
   doc.text(
     `${learner.name}  |  ${learner.admission}  |  ${learner.grade}  |  ${term}`,
+
     20,
+
     43,
   )
+
   doc.line(20, 48, 190, 48)
+
   doc.setFont("helvetica", "bold")
+
   doc.text("Learning area", 20, 58)
+
   doc.text("Result", 120, 58)
+
   doc.text("Level", 150, 58)
+
   doc.setFont("helvetica", "normal")
+
   reportRows.forEach((row, index) => {
     const y = 68 + index * 10
+
     doc.text(row.area, 20, y)
+
     doc.text(row.score === null ? "Pending" : `${row.score}%`, 120, y)
+
     doc.text(row.level, 150, y)
   })
+
   doc.line(20, 124, 190, 124)
+
   doc.text("Attendance: 54 / 56 days", 20, 136)
+
   doc.text(
     "Class teacher: Amani applies learning confidently and consistently.",
+
     20,
+
     148,
   )
+
   doc.text("Verification: GF-2026-AM1042", 20, 274)
+
   doc.save(`${learner.name.replace(/ /g, "-")}-${term.replace(/ /g, "-")}.pdf`)
 }
 
 function StudentContent({ page }: { page: string }) {
   const school = useSchoolStore()
+
   const learner = activeLearner(school)
+
   const admission = learner?.admission ?? ""
+
   const ready = reportReady(school, admission)
+
   const currentResults = learnerResults(school, admission)
+
   const completedScores = currentResults
+
     .map((result) => result.score)
+
     .filter((score): score is number => score !== null)
+
   const overall = completedScores.length
-    ? Math.round(
-        completedScores.reduce((sum, score) => sum + score, 0) /
-          completedScores.length,
-      )
+    ? Math.round(completedScores.reduce((sum, score) => sum + score, 0) / completedScores.length)
     : null
+
   const overallLevel =
     overall === null
       ? "—"
@@ -841,6 +929,7 @@ function StudentContent({ page }: { page: string }) {
           : overall >= 21
             ? "AE"
             : "BE"
+
   if (page === "Results")
     return (
       <Page
@@ -876,25 +965,19 @@ function StudentContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   if (page === "Reports")
     return (
-      <Page
-        title="Report forms"
-        subtitle="View and download released learner progress reports."
-      >
+      <Page title="Report forms" subtitle="View and download released learner progress reports.">
         <div className="content-card report-list">
           <div className="report-icon">
             <FileText />
           </div>
           <div>
             <h2>Learner Progress Report</h2>
-            <p>
-              Term 2, 2026 ·{" "}
-              {ready ? "Released 18 June 2026" : "Preparing automatically"}
-            </p>
+            <p>Term 2, 2026 · {ready ? "Released 18 June 2026" : "Preparing automatically"}</p>
             <span className={ready ? "status-good" : "status-pending"}>
-              <ShieldCheck size={14} />{" "}
-              {ready ? "Complete" : "Waiting for marks"}
+              <ShieldCheck size={14} /> {ready ? "Complete" : "Waiting for marks"}
             </span>
           </div>
           <button className="secondary-button" onClick={() => window.print()}>
@@ -906,8 +989,11 @@ function StudentContent({ page }: { page: string }) {
             onClick={() =>
               downloadReport(
                 "Term 2 2026",
+
                 school.schoolName,
+
                 currentResults,
+
                 learner ?? undefined,
               )
             }
@@ -938,12 +1024,10 @@ function StudentContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   if (page === "Notices")
     return (
-      <Page
-        title="School notices"
-        subtitle="General and class-specific communication."
-      >
+      <Page title="School notices" subtitle="General and class-specific communication.">
         <div className="content-card">
           <div className="card-toolbar">
             <div className="search-box">
@@ -978,12 +1062,10 @@ function StudentContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   if (page === "Fees")
     return (
-      <Page
-        title="Fees"
-        subtitle="Invoice and payment information for the current term."
-      >
+      <Page title="Fees" subtitle="Invoice and payment information for the current term.">
         <section className="fee-hero">
           <div>
             <span>OUTSTANDING BALANCE</span>
@@ -1021,6 +1103,7 @@ function StudentContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   return (
     <Page
       title="Learner overview"
@@ -1030,23 +1113,11 @@ function StudentContent({ page }: { page: string }) {
         <Metric
           label="OVERALL LEVEL"
           value={overallLevel}
-          detail={
-            overall === null
-              ? "Results pending"
-              : `${overall}% current term result`
-          }
+          detail={overall === null ? "Results pending" : `${overall}% current term result`}
           tone="green"
         />
-        <Metric
-          label="ATTENDANCE"
-          value="96.4%"
-          detail="54 of 56 school days"
-        />
-        <Metric
-          label="FEE BALANCE"
-          value="KES 12,450"
-          detail="Updated 18 June"
-        />
+        <Metric label="ATTENDANCE" value="96.4%" detail="54 of 56 school days" />
+        <Metric label="FEE BALANCE" value="KES 12,450" detail="Updated 18 June" />
       </section>
       <div className="dashboard-grid">
         <section className="content-card results-card">
@@ -1113,29 +1184,28 @@ function StudentContent({ page }: { page: string }) {
 
 function TeacherContent({ page }: { page: string }) {
   const school = useSchoolStore()
+
   const [selectedSubject, setSelectedSubject] = useState<string>("Mathematics")
-  const activeLearners = school.learners.filter(
-    (learner) => learner.status === "Active",
-  )
+
+  const activeLearners = school.learners.filter((learner) => learner.status === "Active")
+
   const entered = activeLearners.filter(
-    (learner) =>
-      typeof school.marks[learner.admission]?.[selectedSubject] === "number",
+    (learner) => typeof school.marks[learner.admission]?.[selectedSubject] === "number",
   )
+
   const mean = entered.length
     ? Math.round(
         entered.reduce(
-          (sum, learner) =>
-            sum + Number(school.marks[learner.admission][selectedSubject]),
+          (sum, learner) => sum + Number(school.marks[learner.admission][selectedSubject]),
+
           0,
         ) / entered.length,
       )
     : 0
+
   if (page === "Attendance")
     return (
-      <Page
-        title="Attendance register"
-        subtitle="Grade 5 East · Wednesday, 18 June 2026"
-      >
+      <Page title="Attendance register" subtitle="Grade 5 East · Wednesday, 18 June 2026">
         <div className="content-card">
           <div className="card-toolbar">
             <div>
@@ -1149,27 +1219,31 @@ function TeacherContent({ page }: { page: string }) {
           <div className="register">
             {[
               "Amani Mwangi",
+
               "Baraka Otieno",
+
               "Chebet Koech",
+
               "Dalia Hassan",
+
               "Eliud Kamau",
+
               "Faith Wanjiku",
             ].map((name, index) => (
               <div key={name}>
                 <span className="avatar small">
                   {name
+
                     .split(" ")
+
                     .map((n) => n[0])
+
                     .join("")}
                 </span>
                 <strong>{name}</strong>
                 <div className="attendance-options">
-                  <button className={index === 2 ? "" : "selected"}>
-                    Present
-                  </button>
-                  <button className={index === 2 ? "absent" : ""}>
-                    Absent
-                  </button>
+                  <button className={index === 2 ? "" : "selected"}>Present</button>
+                  <button className={index === 2 ? "absent" : ""}>Absent</button>
                   <button>Late</button>
                 </div>
               </div>
@@ -1178,12 +1252,10 @@ function TeacherContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   if (page === "Results")
     return (
-      <Page
-        title="Results entry"
-        subtitle={`Grade 5 East · ${selectedSubject} · Mid-term`}
-      >
+      <Page title="Results entry" subtitle={`Grade 5 East · ${selectedSubject} · Mid-term`}>
         <div className="entry-summary">
           <Metric
             label="LEARNERS"
@@ -1194,17 +1266,11 @@ function TeacherContent({ page }: { page: string }) {
             label="ENTERED"
             value={String(entered.length)}
             detail={`${
-              activeLearners.length
-                ? Math.round((entered.length / activeLearners.length) * 100)
-                : 0
+              activeLearners.length ? Math.round((entered.length / activeLearners.length) * 100) : 0
             }% complete`}
             tone="green"
           />
-          <Metric
-            label="CLASS MEAN"
-            value={`${mean}%`}
-            detail="Meeting expectations"
-          />
+          <Metric label="CLASS MEAN" value={`${mean}%`} detail="Meeting expectations" />
         </div>
         <div className="content-card">
           <div className="card-toolbar">
@@ -1239,8 +1305,8 @@ function TeacherContent({ page }: { page: string }) {
               </thead>
               <tbody>
                 {activeLearners.map((learner) => {
-                  const score =
-                    school.marks[learner.admission]?.[selectedSubject] ?? null
+                  const score = school.marks[learner.admission]?.[selectedSubject] ?? null
+
                   const level =
                     score === null
                       ? "—"
@@ -1251,6 +1317,7 @@ function TeacherContent({ page }: { page: string }) {
                           : score >= 21
                             ? "AE"
                             : "BE"
+
                   return (
                     <tr key={learner.admission}>
                       <td>{learner.admission}</td>
@@ -1267,12 +1334,13 @@ function TeacherContent({ page }: { page: string }) {
                           aria-label={`${selectedSubject} score for ${learner.name}`}
                           onChange={(event) => {
                             const next = event.target.value
+
                             schoolActions.updateMark(
                               learner.admission,
+
                               selectedSubject,
-                              next === ""
-                                ? null
-                                : Math.max(0, Math.min(100, Number(next))),
+
+                              next === "" ? null : Math.max(0, Math.min(100, Number(next))),
                             )
                           }}
                         />
@@ -1304,26 +1372,13 @@ function TeacherContent({ page }: { page: string }) {
         </div>
       </Page>
     )
+
   return (
     <Page title="Teaching overview" subtitle="Wednesday, 18 June 2026">
       <section className="metrics teacher-metrics">
-        <Metric
-          label="TODAY'S LESSONS"
-          value="5"
-          detail="Next: Mathematics · 10:20"
-        />
-        <Metric
-          label="ATTENDANCE"
-          value="1 class"
-          detail="Still to mark today"
-          tone="amber"
-        />
-        <Metric
-          label="RESULTS PROGRESS"
-          value="91%"
-          detail="Grade 5 Mathematics"
-          tone="green"
-        />
+        <Metric label="TODAY'S LESSONS" value="5" detail="Next: Mathematics · 10:20" />
+        <Metric label="ATTENDANCE" value="1 class" detail="Still to mark today" tone="amber" />
+        <Metric label="RESULTS PROGRESS" value="91%" detail="Grade 5 Mathematics" tone="green" />
       </section>
       <div className="dashboard-grid teacher-grid">
         <section className="content-card">
@@ -1337,8 +1392,11 @@ function TeacherContent({ page }: { page: string }) {
           <div className="lesson-list">
             {[
               ["08:00", "English", "Grade 5 East"],
+
               ["09:20", "Mathematics", "Grade 5 East"],
+
               ["11:00", "Mathematics", "Grade 5 West"],
+
               ["13:40", "Science & Technology", "Grade 5 East"],
             ].map(([time, subject, grade], i) => (
               <div key={time} className={i === 1 ? "next" : ""}>
@@ -1400,11 +1458,15 @@ function TeacherContent({ page }: { page: string }) {
 
 function Page({
   title,
+
   subtitle,
+
   children,
 }: {
   title: string
+
   subtitle: string
+
   children: ReactNode
 }) {
   return (
@@ -1426,61 +1488,100 @@ function Page({
 export default function App() {
   const [portal, setPortal] = useState<Portal>(() => {
     if (API_ENABLED) return "login"
+
     const saved = localStorage.getItem("greenfield-session")
-    return saved === "student" || saved === "teacher" || saved === "admin"
-      ? saved
-      : "login"
+
+    return saved === "student" || saved === "teacher" || saved === "admin" ? saved : "login"
   })
+
   const [checking, setChecking] = useState(API_ENABLED)
+
   useEffect(() => {
     if (API_ENABLED) void loadSchoolSettings()
   }, [])
+
   useEffect(() => {
     if (!API_ENABLED) return
+
     const onExpired = () => {
       hydrateLearners([])
+
       setPortal("login")
     }
+
     window.addEventListener("school-session-expired", onExpired)
+
     return () => window.removeEventListener("school-session-expired", onExpired)
   }, [])
+
   useEffect(() => {
     if (!API_ENABLED) return
+
     let cancelled = false
+
     apiMe()
       .then(async (user) => {
         const next = user ? portalForRole(user.role) : null
+
         if (!next) return
+
         const learners = await apiLearners().catch(() => [])
+
         hydrateLearners(learners)
+
         if (next === "student") {
           const first = learners.find((item) => item.status === "Active")
+
           if (first) setActiveLearner(first.admission)
         }
+
         if (!cancelled) setPortal(next)
       })
+
       .finally(() => {
         if (!cancelled) setChecking(false)
       })
+
     return () => {
       cancelled = true
     }
   }, [])
+
   function enter(next: Portal, remember = false) {
     setPortal(next)
+
     if (!API_ENABLED && remember && next !== "login")
       localStorage.setItem("greenfield-session", next)
   }
+
   function logout() {
     if (API_ENABLED) {
       void apiLogout()
+
       hydrateLearners([])
+
       sessionStorage.removeItem("greenfield-active-learner")
     }
+
     localStorage.removeItem("greenfield-session")
+
     setPortal("login")
   }
-  if (checking) return null
+
+  if (checking)
+    return (
+      <main className="app-bootstrap" aria-live="polite">
+        <div className="app-bootstrap-card">
+          <span className="app-bootstrap-mark" aria-hidden="true">
+            S
+          </span>
+          <strong>Smartschool</strong>
+          <span>Checking your school session…</span>
+          <div className="app-bootstrap-progress" />
+        </div>
+      </main>
+    )
+
   return portal === "login" ? (
     <Login onEnter={enter} />
   ) : (
