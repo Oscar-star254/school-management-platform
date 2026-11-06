@@ -269,7 +269,7 @@ export async function buildLiveReport(options: {
 
   doc.setFontSize(14)
 
-  doc.text("Learner Progress Report", 105, 30, { align: "center" })
+  doc.text("Student Progress Report", 105, 30, { align: "center" })
 
   doc.setFont("helvetica", "normal")
 

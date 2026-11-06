@@ -121,7 +121,7 @@ function FamilyHome({ child }: { child: Child }) {
 
   return (
     <Page
-      title={child.name ?? "Learner"}
+      title={child.name ?? "Student"}
       subtitle="A summary of attendance and the latest published results."
     >
       <section className="admin-metrics">
@@ -215,7 +215,7 @@ function FamilyReports({ child }: { child: Child }) {
         schoolName,
 
         learner: {
-          name: child.name ?? "Learner",
+          name: child.name ?? "Student",
           admission: child.admissionNumber ?? "",
           className: nameOf(child.currentClass),
         },
@@ -289,7 +289,7 @@ function FamilyReports({ child }: { child: Child }) {
   )
 }
 
-/** The learner and parent portal. Students see themselves; parents see each linked child. */
+/** The student and parent portal. Students see themselves; parents see each linked child. */
 
 export function FamilyLive({ page }: { page: string }) {
   const kids = useFind<Child>("students", "limit=50&depth=1&sort=name")
@@ -305,7 +305,7 @@ export function FamilyLive({ page }: { page: string }) {
       <Page title={page} subtitle="">
         <div className="content-card">
           <p style={{ padding: 16 }}>
-            No learner is linked to this account yet. Please contact the school office.
+            No student is linked to this account yet. Please contact the school office.
           </p>
         </div>
       </Page>

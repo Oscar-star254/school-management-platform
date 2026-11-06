@@ -3,6 +3,8 @@ dist/
 build/
 .cache/
 .env*
+!infra/backup-worker/.env.example
+infra/backup-worker/secrets/
 .vite/
 vite.config.*.timestamp-*
 *.tsbuildinfo

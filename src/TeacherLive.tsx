@@ -103,7 +103,7 @@ function TeacherDashboard() {
   const cards: [string, string | number, string][] = [
     ["YOUR CLASSES", classesOf(active).length, "Classes you teach or lead"],
 
-    ["YOUR LEARNERS", active.length, "Active learners in those classes"],
+    ["YOUR STUDENTS", active.length, "Active students in those classes"],
 
     ["OPEN FOR MARKS", count("open"), "Assessments waiting for your marks"],
 
@@ -161,7 +161,7 @@ function TeacherClass() {
   const roster = students.rows.filter((student) => String(relId(student.currentClass)) === classId)
 
   return (
-    <Page title="Class" subtitle="The learners in your classes.">
+    <Page title="Class" subtitle="The students in your classes.">
       <div className="admin-actions">
         <select
           className="table-select"
@@ -180,10 +180,10 @@ function TeacherClass() {
           loading={students.loading}
           error={students.error}
           count={roster.length}
-          text="No learners to show."
+          text="No students to show."
         />
         {roster.length > 0 && (
-          <Table heads={["Admission no.", "Learner", "Status"]}>
+          <Table heads={["Admission no.", "Student", "Status"]}>
             {roster.map((student) => (
               <tr key={student.id}>
                 <td>{student.admissionNumber}</td>
@@ -312,7 +312,7 @@ function TeacherAttendance() {
         ? { err: errors.join(" · ") }
         : {
             ok: saved
-              ? `Attendance saved for ${saved} learner${saved === 1 ? "" : "s"}.`
+              ? `Attendance saved for ${saved} student${saved === 1 ? "" : "s"}.`
               : "Nothing to change.",
           },
     )
@@ -321,7 +321,7 @@ function TeacherAttendance() {
   return (
     <Page
       title="Attendance"
-      subtitle="Mark who is present for your class. Learners not changed are recorded as present."
+      subtitle="Mark who is present for your class. Students not changed are recorded as present."
     >
       <div className="admin-actions">
         <select
@@ -357,11 +357,11 @@ function TeacherAttendance() {
           loading={students.loading}
           error={students.error}
           count={roster.length}
-          text="No active learners in this class."
+          text="No active students in this class."
         />
         {roster.length > 0 && (
           <>
-            <Table heads={["Admission no.", "Learner", "Attendance", "Note"]}>
+            <Table heads={["Admission no.", "Student", "Attendance", "Note"]}>
               {roster.map((student) => (
                 <tr key={student.id}>
                   <td>{student.admissionNumber}</td>
@@ -561,7 +561,7 @@ function TeacherResults() {
         ? { err: errors.join(" · ") }
         : {
             ok: saved
-              ? `Saved marks for ${saved} learner${saved === 1 ? "" : "s"}.`
+              ? `Saved marks for ${saved} student${saved === 1 ? "" : "s"}.`
               : "Nothing to save.",
           },
     )
@@ -575,7 +575,7 @@ function TeacherResults() {
     ).length
 
     const warning = missing
-      ? `${missing} learner${missing === 1 ? " has" : "s have"} no mark yet. `
+      ? `${missing} student${missing === 1 ? " has" : "s have"} no mark yet. `
       : ""
 
     if (
@@ -721,11 +721,11 @@ function TeacherResults() {
               loading={students.loading || marks.loading}
               error={students.error || marks.error}
               count={roster.length}
-              text="No active learners in this class."
+              text="No active students in this class."
             />
             {roster.length > 0 && (
               <>
-                <Table heads={["Admission no.", "Learner", `Mark (out of ${max})`, "Comment"]}>
+                <Table heads={["Admission no.", "Student", `Mark (out of ${max})`, "Comment"]}>
                   {roster.map((student) => (
                     <tr key={student.id}>
                       <td>{student.admissionNumber}</td>

@@ -66,7 +66,7 @@ export function ResultsMonitorLive() {
   }
 
   function publish(a: Assessment) {
-    if (!window.confirm(`Publish ${a.name} for ${nameOf(a.class)}? Learners and parents will be able to see these results immediately.`)) return
+    if (!window.confirm(`Publish ${a.name} for ${nameOf(a.class)}? Students and parents/guardians will be able to see these results immediately.`)) return
     void move(a, "published", `${a.name} published.`)
   }
 

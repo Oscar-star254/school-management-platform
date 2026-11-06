@@ -30,7 +30,7 @@ body {
   color: var(--text);
   background: var(--canvas);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
 }
 button,
@@ -912,7 +912,7 @@ button {
 .sidebar nav p {
   padding: 0 12px;
   margin-bottom: 9px;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 1.2px;
   color: #8996a5;
 }
@@ -930,7 +930,7 @@ button {
   color: #5f6e7d;
   cursor: pointer;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
 }
 .sidebar nav button:hover {
   color: var(--primary-600);
@@ -972,7 +972,7 @@ button {
   height: 36px;
   padding-left: 14px;
   color: #738092;
-  font-size: 12px;
+  font-size: 13px;
 }
 .sidebar nav .sidebar-group-pages button::before {
   content: "";
@@ -1067,13 +1067,13 @@ button {
 }
 .eyebrow {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 1.4px;
   color: var(--muted);
   margin-bottom: 3px;
 }
 .topbar h1 {
-  font: 600 19px var(--font-heading);
+  font: 600 21px var(--font-heading);
 }
 .topbar-actions {
   display: flex;
@@ -1149,13 +1149,13 @@ button {
   justify-content: space-between;
 }
 .page-heading h2 {
-  font: 600 21px var(--font-heading);
+  font: 600 23px var(--font-heading);
   letter-spacing: -0.2px;
 }
 .page-heading p {
   margin-top: 5px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .online-badge {
   display: none;
@@ -2857,5 +2857,169 @@ td.number {
   }
   .topbar-heading {
     min-width: 0;
+  }
+}
+
+.backup-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 20px;
+}
+.backup-summary-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+.backup-summary > div:nth-child(2) {
+  flex: 1;
+}
+.backup-summary strong,
+.backup-section-heading h3 {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--ink);
+}
+.backup-summary p,
+.backup-section-heading p {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.backup-disabled {
+  color: #a12622 !important;
+  font-weight: 600;
+}
+.backup-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+}
+.backup-section-heading > svg {
+  color: var(--primary);
+}
+.backup-empty {
+  padding: 18px 20px;
+  color: var(--text);
+}
+.backup-message,
+.backup-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #eaf5ee;
+  color: #17603a;
+}
+.backup-error {
+  background: #fff0ef;
+  color: #a12622;
+}
+.backup-row-error {
+  max-width: 420px;
+  margin-top: 4px;
+  color: #a12622;
+  font-size: 0.82rem;
+  white-space: normal;
+}
+.backup-status {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #edf1f5;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.backup-status--succeeded {
+  background: #eaf5ee;
+  color: #17603a;
+}
+.backup-status--failed {
+  background: #fff0ef;
+  color: #a12622;
+}
+.backup-status--running {
+  background: #e8f1fc;
+  color: #245c9e;
+}
+.backup-status--expired {
+  background: #f1f2f4;
+  color: #697586;
+}
+.backup-restore {
+  margin-top: 18px;
+}
+.backup-restore-form {
+  display: grid;
+  gap: 14px;
+  padding: 0 20px 20px;
+}
+.backup-restore-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.backup-restore-form input,
+.backup-restore-form select {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.backup-restore-form code {
+  overflow-wrap: anywhere;
+  color: #a12622;
+  font-size: 0.88em;
+}
+.backup-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #f1d89e;
+  border-radius: 10px;
+  background: #fff8e6;
+  color: #704b00;
+  line-height: 1.5;
+}
+.backup-warning svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+@media (max-width: 760px) {
+  .backup-summary {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .backup-summary > div:nth-child(2) {
+    flex-basis: calc(100% - 64px);
+  }
+  .backup-summary > button {
+    width: 100%;
+    justify-content: center;
+  }
+  .backup-section-heading {
+    padding: 16px;
+  }
+  .backup-restore-form {
+    padding: 0 16px 16px;
   }
 }

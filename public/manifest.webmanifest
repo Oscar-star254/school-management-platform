@@ -1,7 +1,7 @@
 {
   "name": "Smartschool",
   "short_name": "Smartschool",
-  "description": "Offline-ready learner, teacher and school administration portal for Smart Schools Kindergarten.",
+  "description": "Offline-ready student, teacher and school administration portal for Smart Schools Kindergarten.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f8fa",

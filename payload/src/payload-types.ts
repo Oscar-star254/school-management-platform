@@ -94,6 +94,7 @@ export interface Config {
     'fee-adjustments': FeeAdjustment;
     'report-publications': ReportPublication;
     'private-files': PrivateFile;
+    'backup-jobs': BackupJob;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -128,6 +129,7 @@ export interface Config {
     'fee-adjustments': FeeAdjustmentsSelect<false> | FeeAdjustmentsSelect<true>;
     'report-publications': ReportPublicationsSelect<false> | ReportPublicationsSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
+    'backup-jobs': BackupJobsSelect<false> | BackupJobsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -340,6 +342,10 @@ export interface Guardian {
    * Login account for this parent/guardian.
    */
   user?: (number | null) | User;
+  /**
+   * Private identification number; visible only to school administrators.
+   */
+  identificationNumber?: string | null;
   phone?: string | null;
   email?: string | null;
   address?: string | null;
@@ -723,6 +729,29 @@ export interface PrivateFile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backup-jobs".
+ */
+export interface BackupJob {
+  id: number;
+  scheduleKey: string;
+  operation: 'backup' | 'restore';
+  trigger: 'daily' | 'manual' | 'restore';
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'expired';
+  scheduledDate?: string | null;
+  fileName?: string | null;
+  objectKey?: string | null;
+  sizeBytes?: number | null;
+  sha256?: string | null;
+  error?: string | null;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+  requestedBy?: (number | null) | User;
+  sourceBackupId?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -852,6 +881,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'private-files';
         value: number | PrivateFile;
+      } | null)
+    | ({
+        relationTo: 'backup-jobs';
+        value: number | BackupJob;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1024,6 +1057,7 @@ export interface StudentsSelect<T extends boolean = true> {
 export interface GuardiansSelect<T extends boolean = true> {
   name?: T;
   user?: T;
+  identificationNumber?: T;
   phone?: T;
   email?: T;
   address?: T;
@@ -1329,6 +1363,28 @@ export interface PrivateFilesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backup-jobs_select".
+ */
+export interface BackupJobsSelect<T extends boolean = true> {
+  scheduleKey?: T;
+  operation?: T;
+  trigger?: T;
+  status?: T;
+  scheduledDate?: T;
+  fileName?: T;
+  objectKey?: T;
+  sizeBytes?: T;
+  sha256?: T;
+  error?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  requestedBy?: T;
+  sourceBackupId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1380,6 +1436,10 @@ export interface SchoolSetting {
    * Upload the badge in the app Settings page.
    */
   schoolBadgeUrl?: string | null;
+  /**
+   * Upload a school photo in the app Settings page.
+   */
+  schoolPhotoUrl?: string | null;
   phone?: string | null;
   email?: string | null;
   address?: string | null;
@@ -1420,6 +1480,7 @@ export interface SchoolSettingsSelect<T extends boolean = true> {
   motto?: T;
   primaryColor?: T;
   schoolBadgeUrl?: T;
+  schoolPhotoUrl?: T;
   phone?: T;
   email?: T;
   address?: T;

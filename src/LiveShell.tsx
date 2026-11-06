@@ -25,9 +25,9 @@ const ROLE_NAMES: Record<string, string> = {
 
   class_teacher: "Class teacher",
 
-  student: "Learner",
+  student: "Student",
 
-  parent: "Parent / guardian",
+  parent: "Parent/Guardian",
 }
 
 /** Name and role of the signed-in person, shown in the sidebar. */

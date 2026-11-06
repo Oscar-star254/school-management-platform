@@ -1,0 +1,19 @@
+services:
+  backup-worker:
+    build:
+      context: ../..
+      dockerfile: infra/backup-worker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      BACKUP_AGE_IDENTITY_FILE: /run/secrets/backup-age-identity
+    volumes:
+      - ./secrets/backup-age-identity.txt:/run/secrets/backup-age-identity:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=${BACKUP_TMPFS_SIZE:-16g}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

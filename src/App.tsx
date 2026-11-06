@@ -129,12 +129,12 @@ const notices = [
 
     title: "Mid-term break",
 
-    body: "Learners break on 20 June and resume on 24 June.",
+    body: "Students break on 20 June and resume on 24 June.",
   },
 ]
 
 const defaultVision =
-  "To nurture confident, curious learners who are ready to shape a brighter future."
+  "To nurture confident, curious students who are ready to shape a brighter future."
 
 const defaultMission =
   "To provide a caring, playful learning environment where every child can learn, grow and thrive."
@@ -244,7 +244,7 @@ function LoginPanel({
                 onFocus={onActivate}
               />
             </div>
-            {kind === "student" && <small>Learners and parents: use the admission number</small>}
+            {kind === "student" && <small>Students and parents/guardians: use the admission number</small>}
           </label>
           <label className="line-field">
             <span>Password</span>
@@ -490,7 +490,7 @@ function Login({ onEnter }: { onEnter: (portal: Portal, remember?: boolean) => v
       </section>
       {modal === "contact" && (
         <Modal title="Contact the school office" onClose={() => setModal(null)}>
-          <p>Accounts are created by the school to protect learner information.</p>
+          <p>Accounts are created by the school to protect student information.</p>
           <dl>
             <div>
               <dt>Telephone</dt>
@@ -507,7 +507,7 @@ function Login({ onEnter }: { onEnter: (portal: Portal, remember?: boolean) => v
         <Modal title="Login help" onClose={() => setModal(null)}>
           {loginError && <p className="modal-note">{loginError}</p>}
           <p>
-            Learners and parents sign in with the learner admission number. Staff use their school
+            Students and parents/guardians sign in with the student admission number. Staff use their school
             username.
           </p>
           <p className="modal-note">
@@ -713,7 +713,7 @@ function AppShell({
               <div>
                 <strong>
                   {portal === "student"
-                    ? (learner?.name ?? "Learner")
+                    ? (learner?.name ?? "Student")
                     : portal === "teacher"
                       ? "Tracy Wafula"
                       : "Jane Njeri"}
@@ -942,7 +942,7 @@ async function downloadReport(
 
   doc.setFontSize(14)
 
-  doc.text("Learner Progress Report", 105, 30, { align: "center" })
+  doc.text("Student Progress Report", 105, 30, { align: "center" })
 
   doc.setFont("helvetica", "normal")
 
@@ -1065,7 +1065,7 @@ function StudentContent({ page }: { page: string }) {
 
   if (page === "Reports")
     return (
-      <Page title="Report forms" subtitle="View and download released learner progress reports.">
+      <Page title="Report forms" subtitle="View and download released student progress reports.">
         <div className="content-card report-list">
           <div className="report-icon">
             <FileText />
@@ -1151,7 +1151,7 @@ function StudentContent({ page }: { page: string }) {
                     {index === 0 && <i />}
                   </h3>
                   <p>{notice.body}</p>
-                  <small>{index === 1 ? "Grade 5" : "All learners"}</small>
+                  <small>{index === 1 ? "Grade 5" : "All students"}</small>
                 </div>
               </article>
             ))}
@@ -1203,8 +1203,8 @@ function StudentContent({ page }: { page: string }) {
 
   return (
     <Page
-      title="Learner overview"
-      subtitle={`${learner?.name ?? "Learner"} · ${admission} · ${learner?.grade ?? "No class"}`}
+      title="Student overview"
+      subtitle={`${learner?.name ?? "Student"} · ${admission} · ${learner?.grade ?? "No class"}`}
     >
       <section className="metrics">
         <Metric
@@ -1306,7 +1306,7 @@ function TeacherContent({ page }: { page: string }) {
         <div className="content-card">
           <div className="card-toolbar">
             <div>
-              <h2>32 learners</h2>
+              <h2>32 students</h2>
               <p>Present is selected by default</p>
             </div>
             <button className="primary-button">
@@ -1532,7 +1532,7 @@ function TeacherContent({ page }: { page: string }) {
               </span>
               <div>
                 <strong>Complete mid-term scores</strong>
-                <p>3 learners remaining</p>
+                <p>3 students remaining</p>
               </div>
               <button>Open</button>
             </article>

@@ -9,6 +9,8 @@ import * as migration_20261030_014626_finance from './20261030_014626_finance'
 import * as migration_20261031_113000_school_platform_features from './20261031_113000_school_platform_features'
 
 import * as migration_20261031_163000_school_photo from './20261031_163000_school_photo'
+import * as migration_20261102_000000_backups from './20261102_000000_backups'
+import * as migration_20261106_000000_parent_identification from './20261106_000000_parent_identification'
 
 export const migrations = [
   {
@@ -57,5 +59,21 @@ export const migrations = [
     down: migration_20261031_163000_school_photo.down,
 
     name: '20261031_163000_school_photo',
+  },
+
+  {
+    up: migration_20261102_000000_backups.up,
+
+    down: migration_20261102_000000_backups.down,
+
+    name: '20261102_000000_backups',
+  },
+
+  {
+    up: migration_20261106_000000_parent_identification.up,
+
+    down: migration_20261106_000000_parent_identification.down,
+
+    name: '20261106_000000_parent_identification',
   },
 ]
