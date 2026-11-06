@@ -26,8 +26,8 @@ type StudentLite = { currentClass?: unknown }
 const ROLE_LABELS: Record<string, string> = {
   staff: "All staff",
   teachers: "Teachers",
-  parents: "Parents and guardians",
-  students: "Learners",
+  parents: "Parents/Guardians",
+  students: "Students",
 }
 const heading = { margin: "22px 0 10px", fontSize: 15 } as const
 
@@ -189,7 +189,7 @@ export function NoticesManage({ teacher }: { teacher?: boolean }) {
   }
 
   return (
-    <Page title="Notices" subtitle={teacher ? "Write to the parents and learners of your classes." : "Announcements for the whole school, a group of people, or one class."}>
+    <Page title="Notices" subtitle={teacher ? "Write to the parents/guardians and students of your classes." : "Announcements for the whole school, a group of people, or one class."}>
       <div className="admin-actions">
         <button className="primary-button" onClick={() => { setOpen(!open); setForm(blank(!!teacher)) }}>
           <Plus size={15} /> {open ? "Close" : "New notice"}

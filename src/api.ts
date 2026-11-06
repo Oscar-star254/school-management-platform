@@ -18,6 +18,22 @@ export type ApiUser = {
   status?: string
 }
 
+export type BackupJob = {
+  id: number
+  operation: "backup" | "restore"
+  trigger: "daily" | "manual" | "restore"
+  status: "queued" | "running" | "succeeded" | "failed" | "expired"
+  scheduledDate?: string
+  fileName?: string
+  sizeBytes?: number
+  sha256?: string
+  error?: string
+  startedAt?: string
+  finishedAt?: string
+  createdAt: string
+  sourceBackupId?: number
+}
+
 class ApiError extends Error {
   status: number
 
@@ -251,6 +267,7 @@ export type FamilyRegistration = {
     name?: string
     phone?: string
     email?: string
+    identificationNumber?: string
     relationship?: string
   }[]
 }
@@ -389,4 +406,29 @@ export async function apiPublishReports(classId: number, termId: number, student
     alreadyPublished: number
     skippedWithoutResults: number
   }
+}
+
+export async function apiBackups(): Promise<{
+  jobs: BackupJob[]
+  canTrigger: boolean
+  canRestore: boolean
+}> {
+  return call("/backups") as Promise<{
+    jobs: BackupJob[]
+    canTrigger: boolean
+    canRestore: boolean
+  }>
+}
+
+export async function apiCreateBackup(): Promise<{ job: BackupJob }> {
+  return call("/backups", { method: "POST", body: JSON.stringify({}) }) as Promise<{
+    job: BackupJob
+  }>
+}
+
+export async function apiRequestBackupRestore(backupId: number, confirmation: string) {
+  return call("/backups/restore", {
+    method: "POST",
+    body: JSON.stringify({ backupId, confirmation }),
+  }) as Promise<{ job: BackupJob }>
 }

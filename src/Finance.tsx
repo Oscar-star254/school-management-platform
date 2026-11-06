@@ -310,7 +310,7 @@ export function FeeStructuresLive() {
   async function generate(s: Structure) {
     if (
       !window.confirm(
-        `Create invoices for every active learner in ${nameOf(s.class)} from “${s.name}”? Learners who already have one are skipped.`,
+        `Create invoices for every active student in ${nameOf(s.class)} from “${s.name}”? Students who already have one are skipped.`,
       )
     )
       return
@@ -573,7 +573,7 @@ export function InvoicesLive() {
         invoice: i,
 
         learner: {
-          name: student?.name ?? (nameOf(i.student) || "Learner"),
+          name: student?.name ?? (nameOf(i.student) || "Student"),
 
           admission: student?.admissionNumber ?? "",
 
@@ -640,11 +640,11 @@ export function InvoicesLive() {
   return (
     <Page
       title="Invoices"
-      subtitle="Fees billed to learners. Invoices cannot be edited. Void one and issue a new invoice, or add an adjustment."
+      subtitle="Fees billed to students. Invoices cannot be edited. Void one and issue a new invoice, or add an adjustment."
     >
       <div className="admin-actions">
         <button className="primary-button" onClick={() => setOpen(!open)}>
-          <Plus size={15} /> {open ? "Close" : "Invoice a learner"}
+          <Plus size={15} /> {open ? "Close" : "Invoice a student"}
         </button>
         <select
           className="table-select"
@@ -660,20 +660,20 @@ export function InvoicesLive() {
         </select>
         <input
           value={search}
-          placeholder="Search invoice number or learner"
+          placeholder="Search invoice number or student"
           onChange={(e) => setSearch(e.target.value)}
         />
         <Note ok={msg.ok} error={msg.err} />
       </div>
       {open && (
         <form className="content-card record-form" onSubmit={create}>
-          <Field label="Learner">
+          <Field label="Student">
             <select
               required
               value={form.student}
               onChange={(e) => setForm({ ...form, student: e.target.value })}
             >
-              <option value="">Choose a learner</option>
+              <option value="">Choose a student</option>
               {active.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name} ({s.admissionNumber})
@@ -767,11 +767,11 @@ export function InvoicesLive() {
           loading={invoices.loading}
           error={invoices.error}
           count={shown.length}
-          text="No invoices yet. Create invoices from a fee structure, or invoice one learner."
+          text="No invoices yet. Create invoices from a fee structure, or invoice one student."
         />
         {shown.length > 0 && (
           <>
-            <Table heads={["Invoice", "Learner", "Term", "Details", "Total", "Status", ""]}>
+            <Table heads={["Invoice", "Student", "Term", "Details", "Total", "Status", ""]}>
               {shown.map((i) => (
                 <tr key={i.id} style={i.status === "void" ? { opacity: 0.55 } : undefined}>
                   <td>
@@ -933,7 +933,7 @@ export function PaymentsLive() {
         </button>
         <input
           value={search}
-          placeholder="Search receipt, learner or reference"
+          placeholder="Search receipt, student or reference"
           onChange={(e) => setSearch(e.target.value)}
         />
         <Note ok={msg.ok} error={msg.err} />
@@ -945,13 +945,13 @@ export function PaymentsLive() {
       </div>
       {open && (
         <form className="content-card record-form" onSubmit={record}>
-          <Field label="Learner">
+          <Field label="Student">
             <select
               required
               value={form.student}
               onChange={(e) => setForm({ ...form, student: e.target.value })}
             >
-              <option value="">Choose a learner</option>
+              <option value="">Choose a student</option>
               {active.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name} ({s.admissionNumber}){" "}
@@ -1018,7 +1018,7 @@ export function PaymentsLive() {
         />
         {shown.length > 0 && (
           <Table
-            heads={["Receipt", "Date", "Learner", "Amount", "Method", "Reference", "Status", ""]}
+            heads={["Receipt", "Date", "Student", "Amount", "Method", "Reference", "Status", ""]}
           >
             {shown.map((p) => (
               <tr key={p.id} style={p.status === "reversed" ? { opacity: 0.55 } : undefined}>
@@ -1108,7 +1108,7 @@ export function ReconciliationLive() {
 
     ["COLLECTED", money(totals.paid), "Valid payments"],
 
-    ["OUTSTANDING", money(owed), "Owed by active learners"],
+    ["OUTSTANDING", money(owed), "Owed by active students"],
   ]
 
   return (
@@ -1132,7 +1132,7 @@ export function ReconciliationLive() {
           <p style={{ padding: 16 }}>Nothing to show yet.</p>
         ) : (
           <Table
-            heads={["Class", "Learners", "Billed (after adjustments)", "Collected", "Outstanding"]}
+            heads={["Class", "Students", "Billed (after adjustments)", "Collected", "Outstanding"]}
           >
             {byClass.map((c) => (
               <tr key={c.name}>
@@ -1182,7 +1182,7 @@ export function ReconciliationLive() {
           disabled={arrears.length === 0}
           onClick={() =>
             downloadCsv("fee-arrears.csv", [
-              ["Admission", "Learner", "Class", "Billed", "Adjustments", "Paid", "Balance"],
+              ["Admission", "Student", "Class", "Billed", "Adjustments", "Paid", "Balance"],
               ...arrears.map((r) => [
                 r.s.admissionNumber ?? "",
                 r.s.name ?? "",
@@ -1200,9 +1200,9 @@ export function ReconciliationLive() {
       </div>
       <div className="content-card">
         {arrears.length === 0 ? (
-          <p style={{ padding: 16 }}>No learners owe fees.</p>
+          <p style={{ padding: 16 }}>No students owe fees.</p>
         ) : (
-          <Table heads={["Admission no.", "Learner", "Class", "Billed", "Paid", "Balance"]}>
+          <Table heads={["Admission no.", "Student", "Class", "Billed", "Paid", "Balance"]}>
             {arrears.map((r) => (
               <tr key={r.s.id}>
                 <td>{r.s.admissionNumber}</td>
@@ -1254,7 +1254,7 @@ export function FamilyFees({ child }: { child: Child }) {
         payment: p,
 
         learner: {
-          name: child.name ?? "Learner",
+          name: child.name ?? "Student",
           admission: child.admissionNumber ?? "",
           className: nameOf(child.currentClass),
         },
@@ -1279,7 +1279,7 @@ export function FamilyFees({ child }: { child: Child }) {
   ]
 
   return (
-    <Page title="Fees" subtitle={`Fee statement for ${child.name ?? "your learner"}.`}>
+    <Page title="Fees" subtitle={`Fee statement for ${child.name ?? "your student"}.`}>
       <Note ok={msg.ok} error={msg.err} />
       <section className="admin-metrics">
         {cards.map(([label, value, detail]) => (
@@ -1321,7 +1321,7 @@ export function FamilyFees({ child }: { child: Child }) {
                           invoice: row.invoice!,
 
                           learner: {
-                            name: child.name ?? "Learner",
+                            name: child.name ?? "Student",
 
                             admission: child.admissionNumber ?? "",
 

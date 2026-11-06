@@ -415,7 +415,7 @@ export function GuardiansLive() {
   const students = useRows<StudentOption>("students", "limit=1000&depth=0&sort=name")
   const [open, setOpen] = useState(false)
   const [msg, setMsg] = useState<Msg>({})
-  const blank = { name: "", phone: "", email: "", password: "", studentId: "", relationship: "guardian" }
+  const blank = { name: "", identificationNumber: "", phone: "", email: "", password: "", studentId: "", relationship: "guardian" }
   const [form, setForm] = useState(blank)
   const [linkFor, setLinkFor] = useState<number | null>(null)
   const [linkForm, setLinkForm] = useState({ studentId: "", relationship: "guardian" })
@@ -439,6 +439,7 @@ export function GuardiansLive() {
       userId = user.id
       const guardian = await apiCreate<{ id: number }>("guardians", {
         name: form.name,
+        identificationNumber: form.identificationNumber.trim() || undefined,
         phone: form.phone || undefined,
         email: form.email,
         user: userId,
@@ -499,10 +500,10 @@ export function GuardiansLive() {
   )
 
   return (
-    <Page title="Guardians" subtitle="Parents and guardians, their sign-in accounts and the children they are linked to.">
+    <Page title="Parents/Guardians" subtitle="Parent/guardian sign-in accounts and the students they are linked to.">
       <div className="admin-actions">
         <button className="primary-button" onClick={() => setOpen(!open)}>
-          <Plus size={15} /> {open ? "Close" : "Add guardian"}
+          <Plus size={15} /> {open ? "Close" : "Add parent/guardian"}
         </button>
         <Note ok={msg.ok} error={msg.err} />
       </div>
@@ -511,6 +512,15 @@ export function GuardiansLive() {
           <label>
             <span>Full name</span>
             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          </label>
+          <label>
+            <span>Parent/Guardian ID number (optional)</span>
+            <input
+              autoComplete="off"
+              maxLength={80}
+              value={form.identificationNumber}
+              onChange={(e) => setForm({ ...form, identificationNumber: e.target.value })}
+            />
           </label>
           <label>
             <span>Phone</span>
@@ -541,12 +551,12 @@ export function GuardiansLive() {
             </select>
           </label>
           <button className="primary-button" type="submit">
-            Add guardian
+            Add parent/guardian
           </button>
         </form>
       )}
       <div className="content-card">
-        <Empty loading={guardians.loading} error={guardians.error} count={guardians.rows.length} text="No guardians added yet." />
+        <Empty loading={guardians.loading} error={guardians.error} count={guardians.rows.length} text="No parents/guardians added yet." />
         {guardians.rows.length > 0 && (
           <div className="table-wrap">
             <table>
@@ -655,10 +665,10 @@ export function LearnersLive() {
   }
 
   return (
-    <Page title="Learners" subtitle="Register learners and manage their status. Admission numbers are created automatically.">
+    <Page title="Students" subtitle="Register students and manage their status. Admission numbers are created automatically.">
       <div className="admin-actions">
         <button className="primary-button" onClick={() => setOpen(!open)}>
-          <Plus size={15} /> {open ? "Close registration" : "Register learner"}
+          <Plus size={15} /> {open ? "Close registration" : "Register student"}
         </button>
         <Note ok={msg.ok} error={msg.err} />
       </div>
@@ -688,19 +698,19 @@ export function LearnersLive() {
             </select>
           </label>
           <button className="primary-button" type="submit">
-            Register learner
+            Register student
           </button>
         </form>
       )}
       <div className="content-card">
-        <Empty loading={loading} error={error} count={rows.length} text="No learners registered yet." />
+        <Empty loading={loading} error={error} count={rows.length} text="No students registered yet." />
         {rows.length > 0 && (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Admission no.</th>
-                  <th>Learner</th>
+                  <th>Student</th>
                   <th>Class</th>
                   <th>Status</th>
                 </tr>
@@ -856,7 +866,7 @@ export function DashboardLive({ onNavigate }: { onNavigate: (page: string) => vo
           ["LEARNERS", "students"],
           ["STAFF", "staff"],
           ["CLASSES", "classes"],
-          ["GUARDIANS", "guardians"],
+          ["PARENTS/GUARDIANS", "guardians"],
         ].map(([label, key]) => (
           <article key={key}>
             <span>{label}</span>
@@ -874,7 +884,7 @@ export function DashboardLive({ onNavigate }: { onNavigate: (page: string) => vo
 
       <div className="dashboard-quick-actions" aria-label="Quick actions">
         {[
-          { label: "Add learner", page: "Learners", Icon: Plus },
+          { label: "Add student", page: "Students", Icon: Plus },
           { label: "Create invoice", page: "Invoices", Icon: WalletCards },
           { label: "Publish reports", page: "Report forms", Icon: FileText },
           { label: "Add event", page: "Events", Icon: CalendarDays },
@@ -896,7 +906,7 @@ export function DashboardLive({ onNavigate }: { onNavigate: (page: string) => vo
               <span className="dashboard-section-label">ACADEMIC SNAPSHOT</span>
               <h3>Class enrolment</h3>
             </div>
-            <span className="dashboard-data-tag">From learner records</span>
+            <span className="dashboard-data-tag">From student records</span>
           </div>
           {students.loading ? (
             <p className="dashboard-state">Loading class enrolment…</p>
@@ -916,11 +926,11 @@ export function DashboardLive({ onNavigate }: { onNavigate: (page: string) => vo
                 ))}
               </div>
               {students.rows.length === 500 && (
-                <p className="dashboard-footnote">Showing the 500 most recently updated learner records.</p>
+                <p className="dashboard-footnote">Showing the 500 most recently updated student records.</p>
               )}
             </>
           ) : (
-            <p className="dashboard-state">No learner records are available yet.</p>
+            <p className="dashboard-state">No student records are available yet.</p>
           )}
           <div className="dashboard-academic-summary">
             <div>

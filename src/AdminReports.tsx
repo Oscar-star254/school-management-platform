@@ -147,7 +147,7 @@ export function ReportFormsLive() {
         schoolName,
 
         learner: {
-          name: student.name ?? "Learner",
+          name: student.name ?? "Student",
           admission: student.admissionNumber ?? "",
           className: klass?.name ?? "",
         },
@@ -223,7 +223,7 @@ export function ReportFormsLive() {
   return (
     <Page
       title="Report forms"
-      subtitle="Choose a class, preview learner reports, and publish them to family portals individually or together."
+      subtitle="Choose a class, preview student reports, and publish them to family portals individually or together."
     >
       <div className="report-class-grid" aria-label="Select class">
         {classes.rows.map((item) => (
@@ -282,14 +282,14 @@ export function ReportFormsLive() {
           loading={students.loading || publications.loading}
           error={students.error || marks.error || publications.error}
           count={roster.length}
-          text="No active learners in this class."
+          text="No active students in this class."
         />
         {roster.length > 0 && (
           <Table
             heads={[
               "",
               "Admission no.",
-              "Learner",
+              "Student",
               "Learning areas published",
               "Family status",
               "Report form",

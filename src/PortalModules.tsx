@@ -52,6 +52,7 @@ import { SettingsLive } from "./AdminSettings"
 import { TimetableAdmin } from "./Timetable"
 
 import { FeeStructuresLive, InvoicesLive, PaymentsLive, ReconciliationLive } from "./Finance"
+import { AdminBackups } from "./AdminBackups"
 
 const assignments = [
   ["Mathematics", "Fractions in daily life", "24 Jun", "Open"],
@@ -63,7 +64,7 @@ const assignments = [
 
 function downloadCsv(learners: ReturnType<typeof useSchoolStore>["learners"]) {
   const body = [
-    "Admission number,Name,Class,Status,Guardian,Phone",
+    "Admission number,Name,Class,Status,Parent/Guardian,Phone",
 
     ...learners.map((learner) =>
       [
@@ -270,14 +271,14 @@ export function TeacherModule({ page }: { page: string }) {
     Class: [
       "Class teacher records",
 
-      "Complete competencies, values and learner comments.",
+      "Complete competencies, values and student comments.",
 
       UsersRound,
     ],
 
     Assignments: ["Assignments", "Create, publish and grade class activities.", FileText],
 
-    Notices: ["Class notices", "Communication sent to Grade 5 East guardians.", Megaphone],
+    Notices: ["Class notices", "Communication sent to Grade 5 East parents/guardians.", Megaphone],
 
     Timetable: ["Weekly timetable", "Your assigned classes and learning areas.", CalendarDays],
   }
@@ -368,7 +369,7 @@ export function TeacherModule({ page }: { page: string }) {
       <div className="module-copy">
         <h3>
           {page === "Class"
-            ? "19 of 32 learner records complete"
+            ? "19 of 32 student records complete"
             : "Three notices published this term"}
         </h3>
         <p>
@@ -385,7 +386,7 @@ export function TeacherModule({ page }: { page: string }) {
 const adminNavGroups = {
   Overview: ["Dashboard"],
 
-  People: ["Learners", "Guardians", "Staff"],
+  People: ["Students", "Parents/Guardians", "Staff"],
 
   Academics: ["Terms & classes", "Learning areas", "Results monitor", "Report forms", "Timetable"],
 
@@ -403,13 +404,13 @@ export { adminNavGroups }
 function AdminTable({ type }: { type: string }) {
   const school = useSchoolStore()
 
-  if (type === "Learners")
+  if (type === "Students")
     return (
       <div className="content-card">
         <div className="card-toolbar">
           <div className="search-box">
             <Search size={15} />
-            <input placeholder="Search learners" />
+            <input placeholder="Search students" />
           </div>
           <button className="secondary-button" onClick={() => downloadCsv(school.learners)}>
             <FileSpreadsheet size={15} /> Export CSV
@@ -420,7 +421,7 @@ function AdminTable({ type }: { type: string }) {
             <thead>
               <tr>
                 <th>Admission no.</th>
-                <th>Learner</th>
+                <th>Student</th>
                 <th>Class</th>
                 <th>Status</th>
                 <th>Account</th>
@@ -552,7 +553,7 @@ function LearnerRegistration() {
     <>
       <div className="admin-actions">
         <button className="primary-button" onClick={() => setOpen(!open)}>
-          <Plus size={15} /> {open ? "Close registration" : "Register learner"}
+          <Plus size={15} /> {open ? "Close registration" : "Register student"}
         </button>
         {message && (
           <span className="save-message">
@@ -615,7 +616,7 @@ function LearnerRegistration() {
             />
           </label>
           <button className="primary-button" type="submit">
-            Create learner and account
+            Create student and account
           </button>
         </form>
       )}
@@ -699,16 +700,29 @@ export function AdminContent({
   page: string
   onNavigate: (page: string) => void
 }) {
+  if (!API_ENABLED && page === "Backups")
+    return (
+      <>
+        <Header title="Database backups" subtitle="Connect the live Payload API and external worker to manage verified backups." />
+        <div className="content-card">
+          <p className="module-copy">
+            Backup controls are unavailable in offline demonstration mode. No database or backup
+            commands run in the browser or Vercel request handlers.
+          </p>
+        </div>
+      </>
+    )
+
   if (!API_ENABLED) return <AdminContentDemo page={page} />
 
   switch (page) {
     case "Dashboard":
       return <DashboardLive onNavigate={onNavigate} />
 
-    case "Learners":
+    case "Students":
       return <LearnersPage />
 
-    case "Guardians":
+    case "Parents/Guardians":
       return <GuardiansByClass />
 
     case "Staff":
@@ -756,6 +770,9 @@ export function AdminContent({
     case "Reconciliation":
       return <ReconciliationLive />
 
+    case "Backups":
+      return <AdminBackups />
+
     default:
       return <ComingSoon page={page} />
   }
@@ -767,9 +784,9 @@ function AdminContentDemo({ page }: { page: string }) {
   const title = page === "Dashboard" ? "School overview" : page
 
   const iconMap: Record<string, typeof BookOpen> = {
-    Learners: GraduationCap,
+    Students: GraduationCap,
 
-    Guardians: UsersRound,
+    "Parents/Guardians": UsersRound,
 
     Staff: UserRoundCog,
 
@@ -804,13 +821,13 @@ function AdminContentDemo({ page }: { page: string }) {
 
   const figures = useMemo(
     () => [
-      ["ATTENDANCE TODAY", "94.8%", "612 of 646 learners"],
+      ["ATTENDANCE TODAY", "94.8%", "612 of 646 students"],
 
       ["RESULTS COMPLETE", "82%", "Term 2 across all classes"],
 
       ["FEES COLLECTED", "KES 3.8M", "76% of term invoices"],
 
-      ["REPORTS READY", "438", "68% of learners"],
+      ["REPORTS READY", "438", "68% of students"],
     ],
 
     [],
@@ -847,15 +864,15 @@ function AdminContentDemo({ page }: { page: string }) {
       </>
     )
 
-  if (page === "Learners")
+  if (page === "Students")
     return (
       <>
         <Header
-          title="Learners"
-          subtitle="Register learners, issue accounts and manage lifecycle status."
+          title="Students"
+          subtitle="Register students, issue accounts and manage lifecycle status."
         />
         <LearnerRegistration />
-        <AdminTable type="Learners" />
+        <AdminTable type="Students" />
       </>
     )
 

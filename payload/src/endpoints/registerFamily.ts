@@ -8,6 +8,7 @@ type GuardianInput = {
   name?: string
   phone?: string
   email?: string
+  identificationNumber?: string
   relationship?: string
 }
 type Body = {
@@ -54,6 +55,8 @@ export const registerFamily: Endpoint = {
     const newOnes = guardians.filter((g) => !g.existingId)
     for (const g of newOnes) {
       if (!g.name?.trim()) return fail(400, 'Each new guardian needs a name.')
+      if ((g.identificationNumber?.trim().length ?? 0) > 80)
+        return fail(400, 'A parent/guardian ID number must be 80 characters or fewer.')
     }
     const needsPassword = newOnes.length > 0 || body.createStudentLogin
     if (needsPassword && (body.password ?? '').length < 8) {
@@ -82,12 +85,26 @@ export const registerFamily: Endpoint = {
         const studentEmail = body.studentEmail?.trim() || `${slug}@family.invalid`
         const user = await req.payload.create({
           collection: 'users',
-          data: { name: `${firstName} ${lastName}`, email: studentEmail, password: body.password!, role: 'student', status: 'active' },
+          data: {
+            name: `${firstName} ${lastName}`,
+            email: studentEmail,
+            password: body.password!,
+            role: 'student',
+            status: 'active',
+          },
           context,
           req,
         })
-        await req.payload.update({ collection: 'students', id: student.id, data: { user: user.id }, req })
-        accounts.push({ name: `${firstName} ${lastName} (learner)`, signIn: body.studentEmail?.trim() || admission })
+        await req.payload.update({
+          collection: 'students',
+          id: student.id,
+          data: { user: user.id },
+          req,
+        })
+        accounts.push({
+          name: `${firstName} ${lastName} (learner)`,
+          signIn: body.studentEmail?.trim() || admission,
+        })
       }
 
       for (const [index, g] of guardians.entries()) {
@@ -109,7 +126,13 @@ export const registerFamily: Endpoint = {
           })
           const guardian = await req.payload.create({
             collection: 'guardians',
-            data: { name: g.name!.trim(), phone: g.phone?.trim() || undefined, email: realEmail, user: user.id },
+            data: {
+              name: g.name!.trim(),
+              phone: g.phone?.trim() || undefined,
+              email: realEmail,
+              identificationNumber: g.identificationNumber?.trim() || undefined,
+              user: user.id,
+            },
             req,
           })
           guardianId = guardian.id
@@ -120,7 +143,8 @@ export const registerFamily: Endpoint = {
           data: {
             guardian: guardianId,
             student: student.id,
-            relationship: (g.relationship as 'mother' | 'father' | 'guardian' | 'other') || 'guardian',
+            relationship:
+              (g.relationship as 'mother' | 'father' | 'guardian' | 'other') || 'guardian',
             isPrimary: index === 0,
           },
           req,

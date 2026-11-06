@@ -290,7 +290,7 @@ export function TeacherAssignments() {
   return (
     <Page
       title="Assignments"
-      subtitle="Set work for your classes, then mark what learners hand in."
+      subtitle="Set work for your classes, then mark what students hand in."
     >
       <div className="admin-actions">
         <button
@@ -375,7 +375,7 @@ export function TeacherAssignments() {
           <Field label="Save as">
             <select value={form.mode} onChange={(e) => setForm({ ...form, mode: e.target.value })}>
               <option value="publish">Publish now</option>
-              <option value="draft">Draft (learners cannot see it)</option>
+              <option value="draft">Draft (students cannot see it)</option>
             </select>
           </Field>
           <button className="primary-button" type="submit">
@@ -465,12 +465,12 @@ export function TeacherAssignments() {
               loading={students.loading || submissions.loading}
               error={students.error}
               count={roster.length}
-              text="No active learners in this class."
+              text="No active students in this class."
             />
             {roster.length > 0 && (
               <Table
                 heads={[
-                  "Learner",
+                  "Student",
                   "Status",
                   "Answer",
                   current.maxMarks ? `Mark (out of ${current.maxMarks})` : "Mark",
@@ -584,7 +584,7 @@ export function TeacherAssignments() {
 
 /* ---------------------------------- family ---------------------------------- */
 
-/** A learner's assignments. Learners can hand in work; parents see the same view without the form. */
+/** A student's assignments. Students can hand in work; parents see the same view without the form. */
 
 export function FamilyAssignments({
   child,

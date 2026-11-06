@@ -58,7 +58,13 @@ export const GuardianLinks: CollectionConfig = {
     afterDelete: [auditAfterDelete('guardian-links')],
   },
   fields: [
-    { name: 'guardian', type: 'relationship', relationTo: 'guardians', required: true, index: true },
+    {
+      name: 'guardian',
+      type: 'relationship',
+      relationTo: 'guardians',
+      required: true,
+      index: true,
+    },
     { name: 'student', type: 'relationship', relationTo: 'students', required: true, index: true },
     {
       name: 'relationship',
@@ -68,7 +74,7 @@ export const GuardianLinks: CollectionConfig = {
       options: [
         { label: 'Mother', value: 'mother' },
         { label: 'Father', value: 'father' },
-        { label: 'Guardian', value: 'guardian' },
+        { label: 'Parent/Guardian', value: 'guardian' },
         { label: 'Other', value: 'other' },
       ],
     },

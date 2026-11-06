@@ -73,6 +73,8 @@ import { ReportPublications } from './collections/ReportPublications'
 import { publishReports } from './endpoints/publishReports'
 
 import { PrivateFiles } from './collections/PrivateFiles'
+import { BackupJobs } from './collections/BackupJobs'
+import { backupEndpoints } from './endpoints/backups'
 
 const filename = fileURLToPath(import.meta.url)
 
@@ -149,6 +151,8 @@ export default buildConfig({
     ReportPublications,
 
     PrivateFiles,
+
+    BackupJobs,
   ],
 
   editor: lexicalEditor(),
@@ -173,7 +177,7 @@ export default buildConfig({
 
   plugins: [],
 
-  endpoints: [familyLogin, registerFamily, generateInvoices, publishReports],
+  endpoints: [familyLogin, registerFamily, generateInvoices, publishReports, ...backupEndpoints],
 
   globals: [SchoolSettings],
 })

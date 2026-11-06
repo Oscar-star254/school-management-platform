@@ -12,7 +12,7 @@ import { hydrateLearners } from "./schoolStore"
 const RELATIONSHIPS: [string, string][] = [
   ["mother", "Mother"],
   ["father", "Father"],
-  ["guardian", "Guardian"],
+  ["guardian", "Parent/Guardian"],
   ["other", "Other"],
 ]
 const heading = { margin: "22px 0 10px", fontSize: 15 } as const
@@ -20,10 +20,10 @@ const heading = { margin: "22px 0 10px", fontSize: 15 } as const
 type StudentRow = { id: number; admissionNumber?: string; name?: string; status?: string; currentClass?: unknown }
 type ClassOpt = { id: number; name?: string }
 type GuardianOpt = { id: number; name?: string; phone?: string }
-type Slot = { mode: "none" | "new" | "existing"; name: string; phone: string; email: string; existingId: string; relationship: string }
-const slot = (mode: Slot["mode"]): Slot => ({ mode, name: "", phone: "", email: "", existingId: "", relationship: "guardian" })
+type Slot = { mode: "none" | "new" | "existing"; name: string; phone: string; email: string; identificationNumber: string; existingId: string; relationship: string }
+const slot = (mode: Slot["mode"]): Slot => ({ mode, name: "", phone: "", email: "", identificationNumber: "", existingId: "", relationship: "guardian" })
 
-/* ------------------------------ guardian slot ------------------------------ */
+/* --------------------------- parent/guardian slot -------------------------- */
 
 function GuardianSlot({
   index,
@@ -40,17 +40,17 @@ function GuardianSlot({
   return (
     <>
       <h3 style={{ ...heading, gridColumn: "1 / -1" }}>
-        Guardian {index + 1} {index === 0 ? "(required)" : "(optional, in case the first is not reachable)"}
+        Parent/Guardian {index + 1} {index === 0 ? "(required)" : "(optional, in case the first is not reachable)"}
       </h3>
-      <Field label="Guardian details">
+      <Field label="Parent/Guardian details">
         <select value={value.mode} onChange={(e) => set({ mode: e.target.value as Slot["mode"] })}>
-          {index === 1 && <option value="none">No second guardian</option>}
-          <option value="new">Add a new guardian</option>
-          <option value="existing">An existing guardian (for example a sibling’s parent)</option>
+          {index === 1 && <option value="none">No second parent/guardian</option>}
+          <option value="new">Add a new parent/guardian</option>
+          <option value="existing">An existing parent/guardian (for example a sibling’s parent)</option>
         </select>
       </Field>
       {value.mode === "existing" && (
-        <Field label="Choose the guardian">
+        <Field label="Choose the parent/guardian">
           <select required value={value.existingId} onChange={(e) => set({ existingId: e.target.value })}>
             <option value="">Choose</option>
             {guardians.map((guardian) => (
@@ -66,6 +66,13 @@ function GuardianSlot({
           <Field label="Full name">
             <input required value={value.name} onChange={(e) => set({ name: e.target.value })} />
           </Field>
+          <Field label="Parent/Guardian ID number (optional)">
+            <input
+              value={value.identificationNumber}
+              autoComplete="off"
+              onChange={(e) => set({ identificationNumber: e.target.value })}
+            />
+          </Field>
           <Field label="Phone">
             <input value={value.phone} placeholder="254700123456" onChange={(e) => set({ phone: e.target.value })} />
           </Field>
@@ -75,7 +82,7 @@ function GuardianSlot({
         </>
       )}
       {value.mode !== "none" && (
-        <Field label="Relationship to the learner">
+        <Field label="Relationship to the student">
           <select value={value.relationship} onChange={(e) => set({ relationship: e.target.value })}>
             {RELATIONSHIPS.map(([key, label]) => (
               <option key={key} value={key}>
@@ -89,7 +96,7 @@ function GuardianSlot({
   )
 }
 
-/* --------------------------------- Learners --------------------------------- */
+/* -------------------------------- Students --------------------------------- */
 
 export function LearnersPage() {
   const learners = useFind<StudentRow>("students", "limit=1000&depth=1&sort=name")
@@ -131,7 +138,13 @@ export function LearnersPage() {
       guardians: chosen.map((s) =>
         s.mode === "existing"
           ? { existingId: Number(s.existingId), relationship: s.relationship }
-          : { name: s.name, phone: s.phone || undefined, email: s.email || undefined, relationship: s.relationship },
+          : {
+              name: s.name,
+              phone: s.phone || undefined,
+              email: s.email || undefined,
+              identificationNumber: s.identificationNumber.trim() || undefined,
+              relationship: s.relationship,
+            },
       ),
     }
     setBusy(true)
@@ -165,10 +178,10 @@ export function LearnersPage() {
   })
 
   return (
-    <Page title="Learners" subtitle="Register a learner together with their guardians. Admission numbers are created automatically.">
+    <Page title="Students" subtitle="Register a student together with their parents/guardians. Admission numbers are created automatically.">
       <div className="admin-actions">
         <button className="primary-button" onClick={() => { setOpen(!open); setDone(null) }}>
-          <Plus size={15} /> {open ? "Close registration" : "Register learner"}
+          <Plus size={15} /> {open ? "Close registration" : "Register student"}
         </button>
         <input value={search} placeholder="Search name or admission number" onChange={(e) => setSearch(e.target.value)} />
         <Note ok={msg.ok} error={msg.err} />
@@ -193,7 +206,7 @@ export function LearnersPage() {
       )}
       {open && (
         <form className="content-card record-form" onSubmit={register}>
-          <h3 style={{ ...heading, gridColumn: "1 / -1" }}>Learner</h3>
+          <h3 style={{ ...heading, gridColumn: "1 / -1" }}>Student</h3>
           <Field label="First name">
             <input required value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
           </Field>
@@ -213,11 +226,11 @@ export function LearnersPage() {
               ))}
             </select>
           </Field>
-          <Field label="Also create a sign-in for the learner">
+          <Field label="Also create a sign-in for the student">
             <input type="checkbox" checked={form.studentLogin} onChange={(e) => setForm({ ...form, studentLogin: e.target.checked })} />
           </Field>
           {form.studentLogin && (
-            <Field label="Learner email (optional, they can use the admission number)">
+            <Field label="Student email (optional, they can use the admission number)">
               <input type="email" value={form.studentEmail} onChange={(e) => setForm({ ...form, studentEmail: e.target.value })} />
             </Field>
           )}
@@ -232,14 +245,14 @@ export function LearnersPage() {
             </>
           )}
           <button className="primary-button" type="submit" disabled={busy}>
-            {busy ? "Registering…" : "Register learner"}
+            {busy ? "Registering…" : "Register student"}
           </button>
         </form>
       )}
       <div className="content-card">
-        <Empty loading={learners.loading} error={learners.error} count={shown.length} text="No learners found." />
+        <Empty loading={learners.loading} error={learners.error} count={shown.length} text="No students found." />
         {shown.length > 0 && (
-          <Table heads={["Admission no.", "Learner", "Class", "Status"]}>
+          <Table heads={["Admission no.", "Student", "Class", "Status"]}>
             {shown.map((learner) => (
               <tr key={learner.id}>
                 <td>{learner.admissionNumber}</td>
@@ -274,7 +287,7 @@ const field = (value: unknown, key: string) =>
   value && typeof value === "object" ? ((value as Record<string, unknown>)[key] as string | undefined) ?? "" : ""
 const realEmail = (value: string) => (value.endsWith("@family.invalid") ? "" : value)
 
-/** Guardians listed under the class their child is in. Read-only: guardians are added when registering a learner. */
+/** Parents/guardians listed under the class their child is in. Added when registering a student. */
 export function GuardiansByClass() {
   const links = useFind<LinkRow>("guardian-links", "limit=2000&depth=2")
   const guardians = useFind<GuardianRow>("guardians", "limit=2000&depth=0&sort=name")
@@ -315,18 +328,18 @@ export function GuardiansByClass() {
     .sort((a, b) => (a.className.startsWith("Not") || a.className.startsWith("No class") ? 1 : 0) - (b.className.startsWith("Not") || b.className.startsWith("No class") ? 1 : 0) || a.className.localeCompare(b.className))
 
   return (
-    <Page title="Guardians" subtitle="Parents and guardians, listed by the class their child is in. Add guardians when you register a learner.">
+    <Page title="Parents/Guardians" subtitle="Parents/guardians, listed by the class their child is in. Add them when registering a student.">
       <div className="admin-actions">
-        <input value={search} placeholder="Search guardian, learner or phone" onChange={(e) => setSearch(e.target.value)} />
+        <input value={search} placeholder="Search parent/guardian, student or phone" onChange={(e) => setSearch(e.target.value)} />
       </div>
-      <Empty loading={links.loading || guardians.loading} error={links.error || guardians.error} count={sections.length} text="No guardians yet. They are added when you register a learner." />
+      <Empty loading={links.loading || guardians.loading} error={links.error || guardians.error} count={sections.length} text="No parents/guardians yet. They are added when registering a student." />
       {sections.map((section) => (
         <div key={section.className}>
           <h3 style={heading}>
             {section.className} ({section.entries.length})
           </h3>
           <div className="content-card">
-            <Table heads={["Guardian", "Relationship", "Phone", "Email", "Learner"]}>
+            <Table heads={["Parent/Guardian", "Relationship", "Phone", "Email", "Student"]}>
               {section.entries.map((entry, index) => (
                 <tr key={`${entry.guardian}-${entry.admission}-${index}`}>
                   <td>
