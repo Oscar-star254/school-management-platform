@@ -8,7 +8,6 @@ type GuardianInput = {
   name?: string
   phone?: string
   email?: string
-  identificationNumber?: string
   relationship?: string
 }
 type Body = {
@@ -55,8 +54,6 @@ export const registerFamily: Endpoint = {
     const newOnes = guardians.filter((g) => !g.existingId)
     for (const g of newOnes) {
       if (!g.name?.trim()) return fail(400, 'Each new guardian needs a name.')
-      if ((g.identificationNumber?.trim().length ?? 0) > 80)
-        return fail(400, 'A parent/guardian ID number must be 80 characters or fewer.')
     }
     const needsPassword = newOnes.length > 0 || body.createStudentLogin
     if (needsPassword && (body.password ?? '').length < 8) {
@@ -130,7 +127,6 @@ export const registerFamily: Endpoint = {
               name: g.name!.trim(),
               phone: g.phone?.trim() || undefined,
               email: realEmail,
-              identificationNumber: g.identificationNumber?.trim() || undefined,
               user: user.id,
             },
             req,

@@ -342,10 +342,6 @@ export interface Guardian {
    * Login account for this parent/guardian.
    */
   user?: (number | null) | User;
-  /**
-   * Private identification number; visible only to school administrators.
-   */
-  identificationNumber?: string | null;
   phone?: string | null;
   email?: string | null;
   address?: string | null;
@@ -1057,7 +1053,6 @@ export interface StudentsSelect<T extends boolean = true> {
 export interface GuardiansSelect<T extends boolean = true> {
   name?: T;
   user?: T;
-  identificationNumber?: T;
   phone?: T;
   email?: T;
   address?: T;

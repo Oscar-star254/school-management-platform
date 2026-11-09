@@ -20,8 +20,8 @@ const heading = { margin: "22px 0 10px", fontSize: 15 } as const
 type StudentRow = { id: number; admissionNumber?: string; name?: string; status?: string; currentClass?: unknown }
 type ClassOpt = { id: number; name?: string }
 type GuardianOpt = { id: number; name?: string; phone?: string }
-type Slot = { mode: "none" | "new" | "existing"; name: string; phone: string; email: string; identificationNumber: string; existingId: string; relationship: string }
-const slot = (mode: Slot["mode"]): Slot => ({ mode, name: "", phone: "", email: "", identificationNumber: "", existingId: "", relationship: "guardian" })
+type Slot = { mode: "none" | "new" | "existing"; name: string; phone: string; email: string; existingId: string; relationship: string }
+const slot = (mode: Slot["mode"]): Slot => ({ mode, name: "", phone: "", email: "", existingId: "", relationship: "guardian" })
 
 /* --------------------------- parent/guardian slot -------------------------- */
 
@@ -65,13 +65,6 @@ function GuardianSlot({
         <>
           <Field label="Full name">
             <input required value={value.name} onChange={(e) => set({ name: e.target.value })} />
-          </Field>
-          <Field label="Parent/Guardian ID number (optional)">
-            <input
-              value={value.identificationNumber}
-              autoComplete="off"
-              onChange={(e) => set({ identificationNumber: e.target.value })}
-            />
           </Field>
           <Field label="Phone">
             <input value={value.phone} placeholder="254700123456" onChange={(e) => set({ phone: e.target.value })} />
@@ -142,7 +135,6 @@ export function LearnersPage() {
               name: s.name,
               phone: s.phone || undefined,
               email: s.email || undefined,
-              identificationNumber: s.identificationNumber.trim() || undefined,
               relationship: s.relationship,
             },
       ),
