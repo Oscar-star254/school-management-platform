@@ -49,8 +49,11 @@ export const getUser = (req: PayloadRequest): AppUser | null => {
   return user
 }
 
-export const hasRole = (user: AppUser | null, ...roles: Role[]): boolean =>
-  !!user && !!user.role && roles.includes(user.role)
+export const hasRole = (user: AppUser | null, ...roles: Role[]): boolean => {
+  if (!user || !user.role) return false
+  if (user.role === 'super_admin') return true
+  return roles.includes(user.role)
+}
 
 /** Access: signed-in, active users with any of the given roles. */
 export const isRole =

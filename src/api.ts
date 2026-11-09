@@ -53,6 +53,8 @@ const TEACHING_ROLES = ["teacher", "class_teacher"]
 export function portalForRole(role?: string): PortalName | null {
   if (!role) return null
 
+  if (role === "super_admin") return "admin"
+
   if (ADMIN_ROLES.includes(role)) return "admin"
 
   if (TEACHING_ROLES.includes(role)) return "teacher"
