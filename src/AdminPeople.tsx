@@ -415,7 +415,7 @@ export function GuardiansLive() {
   const students = useRows<StudentOption>("students", "limit=1000&depth=0&sort=name")
   const [open, setOpen] = useState(false)
   const [msg, setMsg] = useState<Msg>({})
-  const blank = { name: "", identificationNumber: "", phone: "", email: "", password: "", studentId: "", relationship: "guardian" }
+  const blank = { name: "", phone: "", email: "", password: "", studentId: "", relationship: "guardian" }
   const [form, setForm] = useState(blank)
   const [linkFor, setLinkFor] = useState<number | null>(null)
   const [linkForm, setLinkForm] = useState({ studentId: "", relationship: "guardian" })
@@ -439,7 +439,6 @@ export function GuardiansLive() {
       userId = user.id
       const guardian = await apiCreate<{ id: number }>("guardians", {
         name: form.name,
-        identificationNumber: form.identificationNumber.trim() || undefined,
         phone: form.phone || undefined,
         email: form.email,
         user: userId,
@@ -512,15 +511,6 @@ export function GuardiansLive() {
           <label>
             <span>Full name</span>
             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          </label>
-          <label>
-            <span>Parent/Guardian ID number (optional)</span>
-            <input
-              autoComplete="off"
-              maxLength={80}
-              value={form.identificationNumber}
-              onChange={(e) => setForm({ ...form, identificationNumber: e.target.value })}
-            />
           </label>
           <label>
             <span>Phone</span>

@@ -267,7 +267,6 @@ export type FamilyRegistration = {
     name?: string
     phone?: string
     email?: string
-    identificationNumber?: string
     relationship?: string
   }[]
 }
